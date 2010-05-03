@@ -64,17 +64,17 @@ public class SequenceDiagramObject{
 		pen = (Graphics2D)drawableSpace.getGraphics();
 		pen.setColor(Color.black);
 		pen.drawRect((objectID*labelWidth)+((int)(labelWidth*(1-objectBoxWidthRatio))/2), 
-				initTime + northBorder, (int)(labelWidth*objectBoxWidthRatio), 
+				initTime*(int)(labelWidth*objectBoxHeigthRatio) + northBorder, (int)(labelWidth*objectBoxWidthRatio), 
 				(int)(labelWidth*objectBoxHeigthRatio));
 		pen.setColor(Color.orange);
 		pen.fillRect((objectID*labelWidth)+((int)(labelWidth*(1-objectBoxWidthRatio))/2), 
-				initTime + northBorder, (int)(labelWidth*objectBoxWidthRatio), 
+				initTime*(int)(labelWidth*objectBoxHeigthRatio) + northBorder, (int)(labelWidth*objectBoxWidthRatio), 
 				(int)(labelWidth*objectBoxHeigthRatio));
 		
 		pen.setColor(Color.black);
 		pen.drawString(objectID + " - " + objectName, 
 				(objectID*labelWidth)+((int)(labelWidth*(1-objectBoxWidthRatio))/2) + 1, 
-				initTime + northBorder + ((int)(labelWidth*objectBoxHeigthRatio)/2));
+				initTime*(int)(labelWidth*objectBoxHeigthRatio) + northBorder + ((int)(labelWidth*objectBoxHeigthRatio)/2));
 
 	}
 	

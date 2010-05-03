@@ -54,7 +54,7 @@ public class SequenceDiagramView /*implements Scrollable*/ {
 
 		int objectID = newSequenceDiagramObjectID();
 		SequenceDiagramObject newObject = new SequenceDiagramObject(objectPanelWidth, 
-				0, objectName, objectClass, objectID, principalFrame.getContentPane());
+				objectID, objectName, objectClass, objectID, principalFrame.getContentPane());
 		sequenceDiagramObjectList.add(newObject);
 		newObject.drawWholeObject();
 		

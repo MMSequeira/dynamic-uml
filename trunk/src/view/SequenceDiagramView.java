@@ -1,20 +1,19 @@
 package view;
 
-
-import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.Scrollbar;
+import java.awt.GridLayout;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.LinkedList;
-import javax.swing.JFrame;
-import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
-import javax.swing.Scrollable;
-import javax.xml.ws.handler.MessageContext.Scope;
 
-public class SequenceDiagramView /*implements Scrollable*/ {
+
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+
+
+public class SequenceDiagramView {
 
 	/**
 	 * 
@@ -29,10 +28,10 @@ public class SequenceDiagramView /*implements Scrollable*/ {
 	private int initWindowHeight = 700;
 	public static final int objectPanelWidth = 200;
 	
-	private Scrollbar horizontalScrollBar;
-	private Scrollbar verticalScrollBar;
-	
 	private JFrame principalFrame = new JFrame();
+	private JPanel principalPanel = new JPanel();
+	private JScrollPane scroll;
+	
 	private RefreshingThread refreshingThread;
 	
 	private LinkedList<SequenceDiagramObject> sequenceDiagramObjectList =
@@ -40,8 +39,8 @@ public class SequenceDiagramView /*implements Scrollable*/ {
 	
 	public SequenceDiagramView (){
 		initialization();
-		refreshingThread = new RefreshingThread(sequenceDiagramObjectList, refreshStep/*, 
-				horizontalScrollBar, verticalScrollBar*/);
+		refreshingThread = new RefreshingThread(sequenceDiagramObjectList, refreshStep, 
+				principalFrame);
 		refreshingThread.start();
 	}
 	
@@ -49,52 +48,89 @@ public class SequenceDiagramView /*implements Scrollable*/ {
 	 * Creates an internal sequence diagram object and returns the id for that object
 	 * @return id
 	 */
-	public int createSequenceDiagramObject(final String objectName, 
-			final String objectClass){
+	public int createSequenceDiagramObject(final String objectName, final String objectClass, 
+			final int initTime){
 
 		int objectID = newSequenceDiagramObjectID();
 		SequenceDiagramObject newObject = new SequenceDiagramObject(objectPanelWidth, 
-				objectID, objectName, objectClass, objectID, principalFrame.getContentPane());
+				initTime, objectName, objectClass, objectID);
 		sequenceDiagramObjectList.add(newObject);
+		principalPanel.add(newObject,objectID);
+		//Remove jlabels padding as needed
+		if(principalPanel.getComponentCount() > sequenceDiagramObjectList.size())
+			principalPanel.remove(principalPanel.getComponentCount()-1);
+		//
 		newObject.drawWholeObject();
-		
 		return objectID;
 	}
+
+	/**
+	 * Configures primary window
+	 */
+	private void initialization(){
+		addWindowListenerToPrincipalFrame();
+		principalFrame.setTitle(frameName);
+		principalFrame.setSize(initWindowWidth, initWindowHeight);
+		principalFrame.setLayout(new GridLayout(1,1));
+		principalPanel.setLayout(new GridLayout());
+		//Blank jlabels padding
+		JLabel padLabel;
+		for (int i = 0; i < (int)(initWindowWidth/objectPanelWidth); i++){
+			padLabel = new JLabel(" ");
+			padLabel.setPreferredSize(new Dimension(objectPanelWidth, 1000));
+			principalPanel.add(padLabel);
+		}
+		//
+		scroll = new JScrollPane(principalPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+				JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+		principalFrame.add(scroll);
+		principalFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		principalFrame.setVisible(isVisibleOnInit);
+	}
 	
+	/**
+	 * Adds a window specific windows listened to the principal frame
+	 */
+	private void addWindowListenerToPrincipalFrame() {
+		principalFrame.addWindowListener(new WindowListener() {
+			
+			@Override
+			public void windowOpened(WindowEvent e) {
+			}
+			@Override
+			public void windowIconified(WindowEvent e) {
+			}
+			
+			@Override
+			public void windowDeiconified(WindowEvent e) {
+			}
+			
+			@Override
+			public void windowDeactivated(WindowEvent e) {
+			}
+			
+			@Override
+			public void windowClosing(WindowEvent e) {
+			}
+			
+			@Override
+			public void windowClosed(WindowEvent e) {
+				refreshingThread.frameAliveness(false);
+			}
+			
+			@Override
+			public void windowActivated(WindowEvent e) {
+			}
+		});
+		
+	}
+
 	/**
 	 * Decides what will be the id for the created object
 	 * @return id
 	 */
 	private int newSequenceDiagramObjectID(){
 		return sequenceDiagramObjectID++;
-	}
-	
-	/**
-	 * Configures primary window
-	 */
-	private void initialization(){
-		principalFrame.setTitle(frameName);
-		principalFrame.setSize(initWindowWidth, initWindowHeight);
-		principalFrame.setLayout(new BorderLayout());
-		
-		/*
-		principalFrame.add(new JScrollBar(JScrollBar.VERTICAL), BorderLayout.EAST);
-		principalFrame.add(new JScrollBar(JScrollBar.HORIZONTAL), BorderLayout.SOUTH);
-		*/
-		//JScrollPane scrollPane = new JScrollPane();
-		/*principalFrame*/ //add(scrollPane);
-		
-		/*
-		horizontalScrollBar = new Scrollbar(Scrollbar.HORIZONTAL, 10, 0, 
-				initWindowWidth, objectPanelWidth*sequenceDiagramObjectList.size());
-		principalFrame.add(horizontalScrollBar, BorderLayout.SOUTH);
-		verticalScrollBar = new Scrollbar(Scrollbar.VERTICAL, 10, 0, initWindowHeight, 
-				1000);
-		principalFrame.add(verticalScrollBar, BorderLayout.EAST);
-		*/
-		
-		principalFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		principalFrame.setVisible(isVisibleOnInit);
 	}
 	
 	/**
@@ -105,48 +141,14 @@ public class SequenceDiagramView /*implements Scrollable*/ {
 		
 		SequenceDiagramView view = new SequenceDiagramView();
 		for(int i = 0; i < 10; i++){
-			view.createSequenceDiagramObject("Object " + (i+1), "Class 1");
+			view.createSequenceDiagramObject("Object " + (i+1), "Class 1", 0);
 			try {
-				Thread.sleep(2000);
+				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
 		
 	}
-
-	/*
-	@Override
-	public Dimension getPreferredScrollableViewportSize() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int getScrollableBlockIncrement(Rectangle visibleRect,
-			int orientation, int direction) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public boolean getScrollableTracksViewportHeight() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean getScrollableTracksViewportWidth() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public int getScrollableUnitIncrement(Rectangle visibleRect,
-			int orientation, int direction) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-	*/
-
+	
 }

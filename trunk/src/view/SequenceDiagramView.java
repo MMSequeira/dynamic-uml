@@ -37,6 +37,9 @@ public class SequenceDiagramView {
 	private LinkedList<SequenceDiagramObject> sequenceDiagramObjectList =
 		new LinkedList<SequenceDiagramObject>();
 	
+	/**
+	 * Constructor for the user interface
+	 */
 	public SequenceDiagramView (){
 		initialization();
 		refreshingThread = new RefreshingThread(sequenceDiagramObjectList, refreshStep, 

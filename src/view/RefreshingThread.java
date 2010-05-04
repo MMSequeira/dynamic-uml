@@ -1,35 +1,29 @@
 package view;
 
 import java.util.LinkedList;
-import java.awt.Scrollbar;
+import javax.swing.JFrame;
 
 public class RefreshingThread extends Thread {
 
 	private LinkedList<SequenceDiagramObject> objectList;
 	private long refreshStep;
-	/*
-	private Scrollbar horizontalScrollbar;
-	private Scrollbar verticalScrollbar;
-	*/
+	private JFrame principalFrame;
+	private boolean isFrameAlive = true;
 
-	public RefreshingThread(final LinkedList<SequenceDiagramObject> objectList,
-			final long refreshStep/*, final Scrollbar horizontalScrollBar, 
-			final Scrollbar verticalScrollBar*/){
+	public RefreshingThread(final LinkedList<SequenceDiagramObject> objectList, 
+			final long refreshStep, final JFrame principalFrame){
 		this.objectList = objectList;
 		this.refreshStep = refreshStep;
-		/*
-		this.horizontalScrollbar = horizontalScrollBar;
-		this.verticalScrollbar = verticalScrollBar;
-		*/
+		this.principalFrame = principalFrame;
 	}
 	
 	public void run(){
-		while(true){
-			int listSize = objectList.size();
-			//horizontalScrollbar.setMaximum(listSize*SequenceDiagramView.objectPanelWidth);
+		while(isFrameAlive){
+			/*int listSize = objectList.size();
 			for (int i = 0; i < listSize; i++){
 				objectList.get(i).drawWholeObject();
-			}
+			}*/
+			principalFrame.setContentPane(principalFrame.getContentPane());
 			try {
 				Thread.sleep(refreshStep);
 			} catch (InterruptedException e) {
@@ -42,5 +36,8 @@ public class RefreshingThread extends Thread {
 		refreshStep = newRefreshStep;
 	}
 	
+	public void frameAliveness(final boolean aliveStatus){
+		isFrameAlive = aliveStatus;
+	}
 	
 }

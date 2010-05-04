@@ -2,12 +2,14 @@ package view;
 
 
 import java.awt.Color;
-import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 
-import javax.swing.JFrame;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 
-public class SequenceDiagramObject{
+public class SequenceDiagramObject extends JLabel{
 
 	/**
 	 * 
@@ -25,8 +27,9 @@ public class SequenceDiagramObject{
 	private String objectClass;
 	private int objectID;
 	
-	private Container drawableSpace;
+	//private Container drawableSpace;
 	private Graphics2D pen;
+	private BufferedImage drawableSpace;
 	
 	/**
 	 * Constructor for an object of the sequence diagram
@@ -39,15 +42,16 @@ public class SequenceDiagramObject{
 	 * @param drawableSpace
 	 */
 	public SequenceDiagramObject(final int labelWidth, final int initTime,
-			final String objectName, final String objectClass, final int objectID, 
-			final Container drawableSpace) {
+			final String objectName, final String objectClass, final int objectID) {
 		this.labelWidth = labelWidth;
 		this.initTime = initTime;
 		this.objectName = objectName;
 		this.objectClass = objectClass;
 		this.objectID = objectID;
-		this.drawableSpace = drawableSpace;
-		System.out.println("Fui criado: " + objectID);
+		setPreferredSize(new Dimension(labelWidth, 1000));
+		drawableSpace = new BufferedImage(labelWidth, 1000, BufferedImage.TYPE_INT_ARGB);
+		setIcon(new ImageIcon(drawableSpace));
+		pen = (Graphics2D)drawableSpace.getGraphics();
 	}
 	
 	public void drawWholeObject(){
@@ -61,6 +65,8 @@ public class SequenceDiagramObject{
 	}
 	
 	private void drawObjectBox(){
+		
+		/*
 		pen = (Graphics2D)drawableSpace.getGraphics();
 		pen.setColor(Color.black);
 		pen.drawRect((objectID*labelWidth)+((int)(labelWidth*(1-objectBoxWidthRatio))/2), 
@@ -75,7 +81,35 @@ public class SequenceDiagramObject{
 		pen.drawString(objectID + " - " + objectName, 
 				(objectID*labelWidth)+((int)(labelWidth*(1-objectBoxWidthRatio))/2) + 1, 
 				initTime*(int)(labelWidth*objectBoxHeigthRatio) + northBorder + ((int)(labelWidth*objectBoxHeigthRatio)/2));
-
+		*/
+		
+		//pen = (Graphics2D)drawableSpace.getGraphics();
+		pen.setColor(Color.black);
+		pen.drawRect((int)(labelWidth*(1-objectBoxWidthRatio))/2, 
+				initTime*(int)(labelWidth*objectBoxHeigthRatio) + northBorder, 
+				(int)(labelWidth*objectBoxWidthRatio), (int)(labelWidth*objectBoxHeigthRatio));
+		pen.setColor(Color.orange);
+		pen.fillRect((int)(labelWidth*(1-objectBoxWidthRatio))/2, 
+				initTime*(int)(labelWidth*objectBoxHeigthRatio) + northBorder, 
+				(int)(labelWidth*objectBoxWidthRatio), (int)(labelWidth*objectBoxHeigthRatio));
+		
+		pen.setColor(Color.black);
+		pen.drawString(objectID + " - " + objectName, 
+				((int)(labelWidth*(1-objectBoxWidthRatio))/2) + 1, 
+				initTime*(int)(labelWidth*objectBoxHeigthRatio) + northBorder +
+				((int)(labelWidth*objectBoxHeigthRatio)/2));
+		
+		//TESTE
+		/*try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		if(objectID == 0){
+			pen.drawOval(labelWidth/2, 300, 50, 50);
+			pen.fillOval(labelWidth/2, 300, 50, 50);
+		}*/
+		//TESTE
 	}
 	
 	private void drawObjectLifeLine(){

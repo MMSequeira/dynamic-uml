@@ -1,4 +1,4 @@
-package view;
+package untraceable.view;
 
 import java.util.LinkedList;
 import javax.swing.JFrame;

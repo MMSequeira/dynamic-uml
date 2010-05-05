@@ -1,4 +1,4 @@
-package view;
+package untraceable.view;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;

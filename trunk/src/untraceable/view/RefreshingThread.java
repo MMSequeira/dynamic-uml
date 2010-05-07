@@ -10,19 +10,19 @@ public class RefreshingThread extends Thread {
 	private JFrame principalFrame;
 	private boolean isFrameAlive = true;
 
-	public RefreshingThread(final LinkedList<SequenceDiagramObject> objectList, 
-			final long refreshStep, final JFrame principalFrame){
+	public RefreshingThread(final LinkedList<SequenceDiagramObject> objectList,
+			final long refreshStep, final JFrame principalFrame) {
 		this.objectList = objectList;
 		this.refreshStep = refreshStep;
 		this.principalFrame = principalFrame;
 	}
-	
-	public void run(){
-		while(isFrameAlive){
-			/*int listSize = objectList.size();
-			for (int i = 0; i < listSize; i++){
-				objectList.get(i).drawWholeObject();
-			}*/
+
+	public void run() {
+		while (isFrameAlive) {
+			/*
+			 * int listSize = objectList.size(); for (int i = 0; i < listSize;
+			 * i++){ objectList.get(i).drawWholeObject(); }
+			 */
 			principalFrame.setContentPane(principalFrame.getContentPane());
 			try {
 				Thread.sleep(refreshStep);
@@ -31,13 +31,13 @@ public class RefreshingThread extends Thread {
 			}
 		}
 	}
-	
-	public void setRefreshStep(final long newRefreshStep){
+
+	public void setRefreshStep(final long newRefreshStep) {
 		refreshStep = newRefreshStep;
 	}
-	
-	public void frameAliveness(final boolean aliveStatus){
+
+	public void frameAliveness(final boolean aliveStatus) {
 		isFrameAlive = aliveStatus;
 	}
-	
+
 }

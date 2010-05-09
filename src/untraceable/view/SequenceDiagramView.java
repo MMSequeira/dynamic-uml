@@ -74,10 +74,9 @@ public class SequenceDiagramView {
 	 * @return
 	 */
 	public int createSequenceDiagramObject(final String objectName, final String objectClass, 
-			final int initTime, final int givenObjectID){
+			final int initTime){
 
 		int objectID = newSequenceDiagramObjectID();
-		//int objectID = givenObjectID;
 		SequenceDiagramObject newObject = new SequenceDiagramObject(objectPanelWidth, 
 				initTime, objectName, objectClass, objectID, mouseListener, 
 				dragAndDropController, refreshingThread);
@@ -194,14 +193,6 @@ public class SequenceDiagramView {
 	}
 	
 	/**
-	 * Returns the current SequenceDiagramObjectID used for the last object added.
-	 * @return current_id
-	 */
-	public int getSequenceDiagramObjectID() {
-		return sequenceDiagramObjectID;
-	}
-	
-	/**
 	 * Test main method, not used in the final version
 	 * @param args
 	 */
@@ -209,7 +200,7 @@ public class SequenceDiagramView {
 		
 		SequenceDiagramView view = new SequenceDiagramView();
 		for(int i = 0; i < 10; i++){
-			view.createSequenceDiagramObject("Object " + (i), "Class 1", 0, i);
+			view.createSequenceDiagramObject("Object " + (i), "Class 1", 0);
 			if(i > 3){
 				view.killSequenceDiagramObject(i-1, 1);
 			}

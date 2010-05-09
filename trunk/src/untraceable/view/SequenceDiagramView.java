@@ -71,19 +71,18 @@ public class SequenceDiagramView {
 	 * @param objectName
 	 * @param objectClass
 	 * @param initTime
-	 * @param givenObjectID
 	 * @return
 	 */
 	public int createSequenceDiagramObject(final String objectName, final String objectClass, 
 			final int initTime, final int givenObjectID){
 
-		//int objectID = newSequenceDiagramObjectID();
-		int objectID = givenObjectID;
+		int objectID = newSequenceDiagramObjectID();
+		//int objectID = givenObjectID;
 		SequenceDiagramObject newObject = new SequenceDiagramObject(objectPanelWidth, 
 				initTime, objectName, objectClass, objectID, mouseListener, 
 				dragAndDropController, refreshingThread);
 		sequenceDiagramObjectList.add(newObject);
-		principalPanel.add(newObject,newSequenceDiagramObjectID());
+		principalPanel.add(newObject, objectID);
 		//Remove jlabels padding as needed
 		if(principalPanel.getComponentCount() > sequenceDiagramObjectList.size())
 			principalPanel.remove(principalPanel.getComponentCount()-1);
@@ -192,6 +191,14 @@ public class SequenceDiagramView {
 	 */
 	private int newSequenceDiagramObjectID(){
 		return sequenceDiagramObjectID++;
+	}
+	
+	/**
+	 * Returns the current SequenceDiagramObjectID used for the last object added.
+	 * @return current_id
+	 */
+	public int getSequenceDiagramObjectID() {
+		return sequenceDiagramObjectID;
 	}
 	
 	/**

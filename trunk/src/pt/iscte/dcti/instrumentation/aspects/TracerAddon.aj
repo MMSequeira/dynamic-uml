@@ -39,16 +39,16 @@ public privileged aspect TracerAddon extends AbstractTracer {
 	Object around() : constructorCall() {
 		// TODO How to avoid this being applied when there is a this?
 		Object object = proceed();
-		int id = System.identityHashCode(object);
-		System.out.println("id: "+id);
+		int id_object = System.identityHashCode(object);
+		System.out.println("id: "+id_object);
 		
 		String object_class_name = object.getClass().getName();
 		Class class_type = object.getClass();
 		//String object_name = (class_type)object;
 		if(!(object instanceof Enum<?>)) {
 			System.out.println("--Constructor Call-- "+object.toString());
-			hash_map.put(System.identityHashCode(object), sequence_diagram_view.getSequenceDiagramObjectID()+1);
-			sequence_diagram_view.createSequenceDiagramObject(object.toString(), object_class_name, 0, id);
+			int id = sequence_diagram_view.createSequenceDiagramObject(object.toString(), object_class_name, 0);
+			hash_map.put(System.identityHashCode(object), id);
 		}
 		
 		return object;
@@ -68,7 +68,7 @@ public privileged aspect TracerAddon extends AbstractTracer {
 		proceed();
 		int id = System.identityHashCode(thisJoinPoint.getThis());
 		System.out.println("--Finalize Call--");
-		System.out.println("The object: "+thisJoinPoint.getThis()+" is going to be destroyed.");
+		System.out.println("The object: "+thisJoinPoint.getThis()+"  with squence id: "+hash_map.get(id)+" is going to be destroyed.");
 		sequence_diagram_view.killSequenceDiagramObject(hash_map.get(id), 0);
 		hash_map.remove(id);
 		//sequence_diagram_view.killSequenceDiagramObject(id, 0);

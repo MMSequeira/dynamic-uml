@@ -1,16 +1,28 @@
 package untraceable.view;
 
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.GridLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.awt.image.BufferedImage;
 import java.util.LinkedList;
 
 
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
+import javax.swing.TransferHandler;
+
 
 
 public class SequenceDiagramView {
@@ -33,40 +45,69 @@ public class SequenceDiagramView {
 	private JScrollPane scroll;
 	
 	private RefreshingThread refreshingThread;
+	private boolean enableRefreshingThread = false;
+	
+	private DragAndDropController dragAndDropController = new DragAndDropController(this);
 	
 	private LinkedList<SequenceDiagramObject> sequenceDiagramObjectList =
 		new LinkedList<SequenceDiagramObject>();
+	
+	private MouseListener mouseListener = new DragMouseAdapter();
 	
 	/**
 	 * Constructor for the user interface
 	 */
 	public SequenceDiagramView (){
 		initialization();
-		refreshingThread = new RefreshingThread(sequenceDiagramObjectList, refreshStep, 
-				principalFrame);
-		refreshingThread.start();
+		if(enableRefreshingThread){
+			refreshingThread = new RefreshingThread(sequenceDiagramObjectList, refreshStep, 
+					principalFrame);
+			refreshingThread.start();
+		}
 	}
 	
 	/**
 	 * Creates an internal sequence diagram object and returns the id for that object
-	 * @return id
+	 * @param objectName
+	 * @param objectClass
+	 * @param initTime
+	 * @param givenObjectID
+	 * @return
 	 */
 	public int createSequenceDiagramObject(final String objectName, final String objectClass, 
-			final int initTime){
+			final int initTime, final int givenObjectID){
 
-		int objectID = newSequenceDiagramObjectID();
+		//int objectID = newSequenceDiagramObjectID();
+		int objectID = givenObjectID;
 		SequenceDiagramObject newObject = new SequenceDiagramObject(objectPanelWidth, 
-				initTime, objectName, objectClass, objectID);
+				initTime, objectName, objectClass, objectID, mouseListener, 
+				dragAndDropController, refreshingThread);
 		sequenceDiagramObjectList.add(newObject);
-		principalPanel.add(newObject,objectID);
+		principalPanel.add(newObject,newSequenceDiagramObjectID());
 		//Remove jlabels padding as needed
 		if(principalPanel.getComponentCount() > sequenceDiagramObjectList.size())
 			principalPanel.remove(principalPanel.getComponentCount()-1);
 		//
-		newObject.drawWholeObject();
+		//newObject.drawWholeObject();
+		refreshContentPane();
 		return objectID;
 	}
 
+	/**
+	 * 
+	 * @param objectId
+	 */
+	public int killSequenceDiagramObject(final int objectID, final int destructTime){
+		SequenceDiagramObject object = getSequenceDiagramObject(objectID);
+		if(object != null){
+			object.destruct(destructTime);
+			refreshContentPane();
+			return 1;
+		}else{
+			return -1;
+		}
+	}
+	
 	/**
 	 * Configures primary window
 	 */
@@ -78,8 +119,12 @@ public class SequenceDiagramView {
 		principalPanel.setLayout(new GridLayout());
 		//Blank jlabels padding
 		JLabel padLabel;
+		BufferedImage padImage = new BufferedImage(objectPanelWidth,1000,BufferedImage.TYPE_INT_ARGB);
+		Graphics2D pen = (Graphics2D)padImage.getGraphics();
+		pen.setColor(Color.white);
+		pen.fillRect(0, 0, objectPanelWidth, 1000);
 		for (int i = 0; i < (int)(initWindowWidth/objectPanelWidth); i++){
-			padLabel = new JLabel(" ");
+			padLabel = new JLabel(new ImageIcon(padImage));
 			padLabel.setPreferredSize(new Dimension(objectPanelWidth, 1000));
 			principalPanel.add(padLabel);
 		}
@@ -89,6 +134,13 @@ public class SequenceDiagramView {
 		principalFrame.add(scroll);
 		principalFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		principalFrame.setVisible(isVisibleOnInit);
+	}
+	
+	private SequenceDiagramObject getSequenceDiagramObject(final int objectID){
+		for(SequenceDiagramObject object: sequenceDiagramObjectList)
+			if (object.getID() == objectID)
+				return object;
+		return null;
 	}
 	
 	/**
@@ -118,7 +170,9 @@ public class SequenceDiagramView {
 			
 			@Override
 			public void windowClosed(WindowEvent e) {
+				/*
 				refreshingThread.frameAliveness(false);
+				*/
 			}
 			
 			@Override
@@ -126,6 +180,10 @@ public class SequenceDiagramView {
 			}
 		});
 		
+	}
+	
+	private void refreshContentPane(){
+		principalFrame.setContentPane(principalFrame.getContentPane());
 	}
 
 	/**
@@ -144,14 +202,66 @@ public class SequenceDiagramView {
 		
 		SequenceDiagramView view = new SequenceDiagramView();
 		for(int i = 0; i < 10; i++){
-			view.createSequenceDiagramObject("Object " + (i+1), "Class 1", 0);
+			view.createSequenceDiagramObject("Object " + (i), "Class 1", 0, i);
+			if(i > 3){
+				view.killSequenceDiagramObject(i-1, 1);
+			}
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
 		
+	}
+	
+	private class DragMouseAdapter extends MouseAdapter {
+        public void mousePressed(MouseEvent e) {
+            JComponent c = (JComponent) e.getSource();
+            TransferHandler handler = c.getTransferHandler();
+            handler.exportAsDrag(c, e, TransferHandler.COPY);
+            
+        }
+    }
+
+	/*
+	public void addaptDiagramToChanges() {
+		System.out.println("vou fazer o que tenho a fazer");
+		int id = ((SequenceDiagramObject)(principalPanel.getComponent(0))).getID();
+		System.out.println(id);
+	}
+	*/
+	
+	public void moveObject(){
+		int numberOfComponents = principalPanel.getComponentCount();
+		int indexDrag = -1;
+		int indexDrop = -1;
+		boolean gotDrag = false;
+		boolean gotDrop = false;
+		SequenceDiagramObject draggedObject = null;
+		for(int i = 0; i < numberOfComponents; i++){
+			if(((SequenceDiagramObject)((principalPanel.getComponent(i)))).getID() == 
+				dragAndDropController.getDragItem()){
+				indexDrag = i;
+				draggedObject = (SequenceDiagramObject)((principalPanel.getComponent(i)));
+				gotDrag = true;
+			}
+			if(((SequenceDiagramObject)((principalPanel.getComponent(i)))).getID() == 
+				dragAndDropController.getDropItem()){
+				indexDrop = i;
+				gotDrop = true;
+			}
+			if(gotDrag && gotDrop)
+				i = numberOfComponents;
+		}
+		System.out.println("Drag index " + indexDrag + " on index " + indexDrop);
+		if(draggedObject != null){
+			principalPanel.add(draggedObject, indexDrop);
+		}else{
+			JOptionPane.showMessageDialog(null, "Error: Drag and Drop");
+		}
+		
+		refreshContentPane();
 	}
 	
 }

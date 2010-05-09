@@ -53,14 +53,14 @@ import pt.iscte.dcti.visual_tracer.controller.IController;
 
 
 
-aspect Tracer {
+abstract aspect AbstractTracer {
 	
 	private boolean _firstExecution = true;
 	
 	private int _callDepth = -1;
 	private IController _controller;
 	
-	public Tracer()
+	public AbstractTracer()
 	{
 	}
 	
@@ -70,7 +70,7 @@ aspect Tracer {
 	pointcut mainMethod() : execution(public static void *.main(..));		
 	
 	//catch all join points (in class and nested classes) inside of packages that are part of the profiler application
-	pointcut codeInsideMyProject() : within((pt.iscte.dcti.instrumentation..* || pt.iscte.dcti.visual_tracer..* || untraceable.*..*) && !pt.iscte.dcti.instrumentation.examples..*) || cflow(execution(String *.toString()));
+	pointcut codeInsideMyProject() : within((pt.iscte.dcti.instrumentation..* || pt.iscte.dcti.visual_tracer..*) && !pt.iscte.dcti.instrumentation.examples..*) || cflow(execution(String *.toString()));
 	
 	pointcut classInitialization() : staticinitialization(*);
 	

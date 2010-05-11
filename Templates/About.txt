@@ -1,0 +1,69 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<style>
+body {
+	font-family: Verdana, Geneva, sans-serif;
+	font-size: 12px;
+}
+
+table 
+{
+	font-size: 12px;
+}
+
+</style>
+</head>
+<body>
+<div style="width:550px; height:570px;">
+<p>O presentre trabalho foi desenvolvido no âmbito da cadeira <br>
+Programação Avançada em 2009\2010 no Instituto Universitário de Lisboa - <a href="http://www.iscte.pt"  target="_blank">IUL</a>.</p>
+<p>O trabalho foi elaborado pelos seguintes membros:</p>
+<table width="388" border="1">
+  <tr>
+    <td width="313"><strong>Carlos Correia</strong></td>
+    <td width="59" rowspan="3"><img src="#DIR#/Templates/CarlosCorreia.jpg" width="63" height="74"></td>
+  </tr>
+  <tr>
+    <td>mail.cefc@gmail.com</td>
+  </tr>
+  <tr>
+    <td>Mestrado Engenharia Informática</td>
+  </tr>
+</table>
+<br>
+<table width="388" border="1">
+  <tr>
+    <td width="313"><strong>Rute Oliveira</strong></td>
+    
+    <td width="59" rowspan="3"><img src="#DIR#/Templates/RuteOliveira.jpg" width="63" height="74"></td>
+  </tr>
+  <tr>
+    <td>rute23@gmail.com</td>
+  </tr>
+  <tr>
+    <td>Mestrado Engenharia Informática</td>
+  </tr>
+</table>
+
+<p>Tendo sido extendido ou alterado por :</p>
+<p>A aguardar corajosos...</p>
+
+<p>Todo o trabalho teve a preciosa ajuda assim como a supervisão e avaliação de:</p>
+<table width="388" border="1">
+  <tr>
+    <td width="313"><strong>Manuel Menezes de Sequeira</strong></td>
+    <td rowspan="3"><img src="#DIR#/Templates/ManuelSequeira.jpg" width="63" height="74"></td>
+  </tr>
+  <tr>
+    <td>manuel.sequeira@iscte.pt</td>
+  </tr>
+    <tr>
+    <td>Professor Auxiliar DCTI</td>
+  </tr>
+</table>
+<p align="center">Visual Tracer V 1.0</p>
+<p align="center"><img src="#DIR#/Templates/LogoIscte.jpg" width="278" height="81" align="middle" /></p>
+</div>
+</body>
+</html>

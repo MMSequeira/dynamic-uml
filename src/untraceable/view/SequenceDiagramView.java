@@ -25,6 +25,7 @@ import javax.swing.TransferHandler;
 
 
 
+
 public class SequenceDiagramView {
 
 	/**
@@ -48,6 +49,7 @@ public class SequenceDiagramView {
 	private boolean enableRefreshingThread = false;
 	
 	private DragAndDropController dragAndDropController = new DragAndDropController(this);
+	private EventTimeController eventTimeController = new EventTimeController();
 	
 	private LinkedList<SequenceDiagramObject> sequenceDiagramObjectList =
 		new LinkedList<SequenceDiagramObject>();
@@ -74,19 +76,21 @@ public class SequenceDiagramView {
 	 * @return
 	 */
 	public int createSequenceDiagramObject(final String objectName, final String objectClass, 
-			final int initTime){
+			final int callerObjectID){
 
 		int objectID = newSequenceDiagramObjectID();
-		SequenceDiagramObject newObject = new SequenceDiagramObject(objectPanelWidth, 
-				initTime, objectName, objectClass, objectID, mouseListener, 
-				dragAndDropController, refreshingThread);
+		int initTime = eventTimeController.eventTime(SequenceDiagramEvent.NewObject);
+		//int initTime = 0;
+		SequenceDiagramObject newObject = new SequenceDiagramObject(initTime, objectName, objectClass, objectID, mouseListener, 
+				dragAndDropController, eventTimeController, refreshingThread);
 		sequenceDiagramObjectList.add(newObject);
 		principalPanel.add(newObject, objectID);
 		//Remove jlabels padding as needed
 		if(principalPanel.getComponentCount() > sequenceDiagramObjectList.size())
 			principalPanel.remove(principalPanel.getComponentCount()-1);
 		//
-		//newObject.drawWholeObject();
+
+		refreshObjectsLifeLines();
 		refreshContentPane();
 		return objectID;
 	}
@@ -95,10 +99,10 @@ public class SequenceDiagramView {
 	 * 
 	 * @param objectId
 	 */
-	public int killSequenceDiagramObject(final int objectID, final int destructTime){
+	public int killSequenceDiagramObject(final int objectID){
 		SequenceDiagramObject object = getSequenceDiagramObject(objectID);
 		if(object != null){
-			object.destruct(destructTime);
+			object.destruct(eventTimeController.eventTime(SequenceDiagramEvent.KillObject));
 			refreshContentPane();
 			return 1;
 		}else{
@@ -120,10 +124,10 @@ public class SequenceDiagramView {
 		BufferedImage padImage = new BufferedImage(objectPanelWidth,1000,BufferedImage.TYPE_INT_ARGB);
 		Graphics2D pen = (Graphics2D)padImage.getGraphics();
 		pen.setColor(Color.white);
-		pen.fillRect(0, 0, objectPanelWidth, 1000);
+		pen.fillRect(0, 0, objectPanelWidth, SequenceDiagramObject.initObjectDrawableSpaceHeigth);
 		for (int i = 0; i < (int)(initWindowWidth/objectPanelWidth); i++){
 			padLabel = new JLabel(new ImageIcon(padImage));
-			padLabel.setPreferredSize(new Dimension(objectPanelWidth, 1000));
+			padLabel.setPreferredSize(new Dimension(objectPanelWidth, SequenceDiagramObject.initObjectDrawableSpaceHeigth));
 			principalPanel.add(padLabel);
 		}
 		//
@@ -180,6 +184,12 @@ public class SequenceDiagramView {
 		
 	}
 	
+	private void refreshObjectsLifeLines(){
+		for(SequenceDiagramObject object: sequenceDiagramObjectList){
+			object.drawObjectLifeLine();
+		}
+	}
+	
 	private void refreshContentPane(){
 		principalFrame.setContentPane(principalFrame.getContentPane());
 	}
@@ -202,7 +212,7 @@ public class SequenceDiagramView {
 		for(int i = 0; i < 10; i++){
 			view.createSequenceDiagramObject("Object " + (i), "Class 1", 0);
 			if(i > 3){
-				view.killSequenceDiagramObject(i-1, 1);
+				view.killSequenceDiagramObject(i-1);
 			}
 			try {
 				Thread.sleep(100);

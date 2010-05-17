@@ -69,7 +69,7 @@ public privileged aspect TracerAddon extends AbstractTracer {
 		int id = System.identityHashCode(thisJoinPoint.getThis());
 		System.out.println("--Finalize Call--");
 		System.out.println("The object: "+thisJoinPoint.getThis()+"  with squence id: "+hash_map.get(id)+" is going to be destroyed.");
-		sequence_diagram_view.killSequenceDiagramObject(hash_map.get(id), 0);
+		sequence_diagram_view.killSequenceDiagramObject(hash_map.get(id));
 		hash_map.remove(id);
 		//sequence_diagram_view.killSequenceDiagramObject(id, 0);
 	}

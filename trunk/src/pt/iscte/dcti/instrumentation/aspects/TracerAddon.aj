@@ -6,12 +6,14 @@ import untraceable.view.SequenceDiagramView;
 //import java.io.;
 public privileged aspect TracerAddon extends AbstractTracer {
 	
+	private final boolean DISPLAY_CONSOLE_MESSAGES = true;
+	
 	private SequenceDiagramView sequence_diagram_view;
 	private HashMap<Integer, Integer> hash_map;
 	
 	public TracerAddon() {
 		sequence_diagram_view = new SequenceDiagramView();
-		hash_map= new HashMap();
+		hash_map = new HashMap();
 	}
 	
 	//POINTCUTs
@@ -40,13 +42,14 @@ public privileged aspect TracerAddon extends AbstractTracer {
 		// TODO How to avoid this being applied when there is a this?
 		Object object = proceed();
 		int id_object = System.identityHashCode(object);
-		System.out.println("id: "+id_object);
+		//System.out.println("id: "+id_object);
 		
 		String object_class_name = object.getClass().getName();
 		Class class_type = object.getClass();
 		//String object_name = (class_type)object;
 		if(!(object instanceof Enum<?>)) {
-			System.out.println("--Constructor Call-- "+object.toString());
+			if(DISPLAY_CONSOLE_MESSAGES)
+				System.out.println("--Constructor Call-- "+object.toString());
 			int id = sequence_diagram_view.createSequenceDiagramObject(object.toString(), object_class_name, 0);
 			hash_map.put(System.identityHashCode(object), id);
 		}
@@ -58,28 +61,41 @@ public privileged aspect TracerAddon extends AbstractTracer {
 	//TODO Remove usage of package (examples..*)
 	declare parents: !(!(examples..*)||hasmethod(public void finalize()) || Enum+ ) implements HandledFinalize;
 	
-	/*
-	after() : execution(public void *.finalize()) {
-		System.out.println("MORRI");
-	}
-	*/
-	
 	void around() : execution(public void *.finalize()) {
 		proceed();
 		int id = System.identityHashCode(thisJoinPoint.getThis());
-		System.out.println("--Finalize Call--");
-		System.out.println("The object: "+thisJoinPoint.getThis()+"  with squence id: "+hash_map.get(id)+" is going to be destroyed.");
+		if(DISPLAY_CONSOLE_MESSAGES) {
+			System.out.println("--Finalize Call--");
+			System.out.println("The object: "+thisJoinPoint.getThis()+"  with squence id: "+hash_map.get(id)+" is going to be destroyed.");
+		}
 		sequence_diagram_view.killSequenceDiagramObject(hash_map.get(id));
 		hash_map.remove(id);
-		//sequence_diagram_view.killSequenceDiagramObject(id, 0);
 	}
 	
-	/*
-	before() : weavableClass() && finalizeCall() { //finalizeCall() {
-		System.out.println("--Morte de objecto--");
-		System.out.println("O objecto: "+thisJoinPoint.getThis()+" morreu.");
-		//proceed();
+	//--Catch Generic Function and Method Calls--
+	
+	private pointcut methodCalls() : call(void *..*(..)) && !codeInsideMyProject();
+	private pointcut functionCalls() : call(* *..*(..)) && !methodCalls() && !codeInsideMyProject();
+	
+	void around() : methodCalls() {
+		int id_this = System.identityHashCode(thisJoinPoint.getThis());
+		int id_target = System.identityHashCode(thisJoinPoint.getTarget());
+		if(DISPLAY_CONSOLE_MESSAGES) {
+			System.out.println("--METHOD CALL--");
+			System.out.println("The object: "+thisJoinPoint.getThis()+" with sequence id: "+hash_map.get(id_this)+" called method: "+thisJoinPoint.getSignature()+" from object: "+thisJoinPoint.getTarget()+" with sequence id: "+hash_map.get(id_target));
+		}
+		proceed();
 	}
-	*/
+	
+	Object around() : functionCalls() {
+		int id_this = System.identityHashCode(thisJoinPoint.getThis());
+		int id_target = System.identityHashCode(thisJoinPoint.getTarget());
+		if(DISPLAY_CONSOLE_MESSAGES) {
+			System.out.println("--FUNCTION CALL--");
+			System.out.println("The object: "+thisJoinPoint.getThis()+" with sequence id: "+hash_map.get(id_this)+" called function: "+thisJoinPoint.getSignature()+" from object: "+thisJoinPoint.getTarget()+" with sequence id: "+hash_map.get(id_target));
+		}
+		Object object = proceed();
+		return object;
+	}
 	
 }

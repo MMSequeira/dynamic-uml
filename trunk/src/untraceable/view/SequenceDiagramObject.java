@@ -4,7 +4,6 @@ package untraceable.view;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.awt.Polygon;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
@@ -48,7 +47,7 @@ public class SequenceDiagramObject extends JLabel{
 	private DragAndDropController dragAndDropController;
 	private EventTimeController eventTimeController;
 	private RefreshingThread refreshingThread;
-	private LinkedList<SequenceDiagramCall> callList;
+	private LinkedList<SequenceDiagramObjectCall> callList;
 	
 	private Color backgroundColor = Color.white;
 	
@@ -81,8 +80,8 @@ public class SequenceDiagramObject extends JLabel{
 		this.dragAndDropController = dragAndDropController;
 		this.eventTimeController = eventTimeController;
 		this.refreshingThread = refreshingThread;
-		callList = new LinkedList<SequenceDiagramCall>();
-		callList.add(new SequenceDiagramCall(initTime, CallWay.Right, CallType.NewReceive));
+		callList = new LinkedList<SequenceDiagramObjectCall>();
+		callList.add(new SequenceDiagramObjectCall("new", initTime, CallWay.Right, CallType.NewReceive));
 		
 		setPreferredSize(new Dimension(labelWidth, initObjectDrawableSpaceHeigth));
 		drawableSpace = new BufferedImage(labelWidth, initObjectDrawableSpaceHeigth, BufferedImage.TYPE_INT_ARGB);
@@ -141,8 +140,8 @@ public class SequenceDiagramObject extends JLabel{
 		drawObjectDestructCross();
 	}
 	
-	public void newCall(final int time, final CallWay way, final CallType type){
-		SequenceDiagramCall newCall = new SequenceDiagramCall(time, way, type);
+	public void newCall(final String callName, final int time, final CallWay way, final CallType type){
+		SequenceDiagramObjectCall newCall = new SequenceDiagramObjectCall(callName, time, way, type);
 		drawCall(newCall);
 		callList.add(newCall);
 	}
@@ -195,7 +194,7 @@ public class SequenceDiagramObject extends JLabel{
 	}
 	
 	private void drawObjectCalls(){
-		for(SequenceDiagramCall call: callList){
+		for(SequenceDiagramObjectCall call: callList){
 			drawCall(call);
 		}
 		refreshDrawing();
@@ -220,13 +219,14 @@ public class SequenceDiagramObject extends JLabel{
 		refreshDrawing();
 	}
 	
-	private void drawCall(final SequenceDiagramCall call){
+	private void drawCall(final SequenceDiagramObjectCall call){
 		int right = 0;
 		if(call.getWay().equals(CallWay.Right))
 			right = 1;
 		int time = call.getTime();
+		String name = call.getName();
 		pen.setColor(Color.black);
-		if(call.getType().equals(CallType.NewSend)){
+		if(call.getType().equals(CallType.NewSend) || call.getType().equals(CallType.CallSend)){
 			pen.drawOval(labelWidth/2-(int)callLinkCircleRadius, 
 					time-(int)callLinkCircleRadius, (int)callLinkCircleRadius*2, 
 					(int)callLinkCircleRadius*2);
@@ -254,10 +254,20 @@ public class SequenceDiagramObject extends JLabel{
 							(Math.pow(-1, right)*
 									((int)callLinkCircleRadius*2))), 
 									time+((int)callLinkCircleRadius));
+			pen.drawString(name+"( )", (labelWidth/2)*(1-right)+(int)callLinkCircleRadius*2, time-3);
 			
-		}else if(call.getType().equals(CallType.CallSend)){
+		//}else if(call.getType().equals(CallType.CallSend)){
 			
 		}else if(call.getType().equals(CallType.CallReceive)){
+			pen.drawLine(labelWidth*(1-right), time, 
+					labelWidth/2, time);
+			pen.drawLine(labelWidth/2, time, (int)(labelWidth/2+
+					(Math.pow(-1, right)*((int)callLinkCircleRadius*2))), 
+					time-((int)callLinkCircleRadius));
+			pen.drawLine(labelWidth/2, time, (int)(labelWidth/2+
+					(Math.pow(-1, right)*((int)callLinkCircleRadius*2))), 
+					time+((int)callLinkCircleRadius));
+			pen.drawString(name+"( )", (labelWidth/2)*(1-right)+(int)callLinkCircleRadius*2, time-3);
 			
 		}else if(call.getType().equals(CallType.ReturnSend)){
 			
@@ -294,7 +304,7 @@ public class SequenceDiagramObject extends JLabel{
 	//not to be in the final version
 	public void printCalls(){
 		System.out.println("Object: " + objectName + " calls:");
-		for(SequenceDiagramCall c: callList)
+		for(SequenceDiagramObjectCall c: callList)
 			System.out.println(c.toString());
 	}
 	

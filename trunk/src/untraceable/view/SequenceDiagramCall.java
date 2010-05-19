@@ -2,30 +2,33 @@ package untraceable.view;
 
 public class SequenceDiagramCall {
 
-	private int time;
-	private CallWay way;
-	private CallType type;
+	private int callID;
+	private String methodName;
+	private SequenceDiagramObject caller;
+	private SequenceDiagramObject callee;
 	
-	public SequenceDiagramCall(final int time, final CallWay way, final CallType type){
-		this.time = time;
-		this.way = way;
-		this.type = type;
+	public SequenceDiagramCall(final int callID, final String methodName,
+			final SequenceDiagramObject caller, final SequenceDiagramObject callee) {
+		this.callID = callID;
+		this.methodName = methodName;
+		this.caller = caller;
+		this.callee = callee;
 	}
 
-	public int getTime() {
-		return time;
+	public int getID() {
+		return callID;
 	}
 
-	public CallWay getWay() {
-		return way;
+	public String getMethodName() {
+		return methodName;
 	}
 
-	public CallType getType() {
-		return type;
+	public SequenceDiagramObject getCaller() {
+		return caller;
 	}
-	
-	public String toString(){
-		return "------\nTime: " + time + "\nWay: " + way + "\nType: " + type + "\n------";
+
+	public SequenceDiagramObject getCallee() {
+		return callee;
 	}
 	
 }

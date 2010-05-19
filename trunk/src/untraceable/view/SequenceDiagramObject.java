@@ -4,6 +4,7 @@ package untraceable.view;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.Polygon;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
@@ -30,11 +31,13 @@ public class SequenceDiagramObject extends JLabel{
 	private static final float objectBoxHeigthRatio = objectBoxWidthRatio/2;
 	private static final float objectCrossWidthRatio = objectBoxHeigthRatio/2;
 	private static final float objectCrossHeigthRatio = objectBoxHeigthRatio/2;
+	private static final float callLinkCircleRatio = 0.015f;
 	
 	private static final float objectBoxWidth = objectBoxWidthRatio*SequenceDiagramView.objectPanelWidth;
 	public static final float objectBoxHeigth = objectBoxHeigthRatio*SequenceDiagramView.objectPanelWidth;
 	private static final float objectCrossWidth = objectCrossWidthRatio*SequenceDiagramView.objectPanelWidth;
 	public static final float objectCrossHeigth = objectCrossHeigthRatio*SequenceDiagramView.objectPanelWidth;
+	private static final float callLinkCircleRadius = callLinkCircleRatio*SequenceDiagramView.objectPanelWidth;
 	
 	private int labelWidth;
 	private int initTime = 0;
@@ -224,12 +227,34 @@ public class SequenceDiagramObject extends JLabel{
 		int time = call.getTime();
 		pen.setColor(Color.black);
 		if(call.getType().equals(CallType.NewSend)){
+			pen.drawOval(labelWidth/2-(int)callLinkCircleRadius, 
+					time-(int)callLinkCircleRadius, (int)callLinkCircleRadius*2, 
+					(int)callLinkCircleRadius*2);
+			pen.fillOval(labelWidth/2-(int)callLinkCircleRadius, 
+					time-(int)callLinkCircleRadius, (int)callLinkCircleRadius*2, 
+					(int)callLinkCircleRadius*2);
 			pen.drawLine(labelWidth/2, time, 
 					labelWidth*right, time);
+			
 		}else if(call.getType().equals(CallType.NewReceive)){
 			pen.drawLine(labelWidth*(1-right), time, 
 					(int)(((labelWidth*(1-objectBoxWidthRatio))/2)+
 							((1-right)*objectBoxWidth)), time);
+			pen.drawLine((int)(((labelWidth*(1-objectBoxWidthRatio))/2)+
+							((1-right)*objectBoxWidth)), time, 
+							(int)(((int)(((labelWidth*(1-objectBoxWidthRatio))/2)+
+									((1-right)*objectBoxWidth)))+
+									(Math.pow(-1, right)*
+											((int)callLinkCircleRadius*2))), 
+											time-((int)callLinkCircleRadius));
+			pen.drawLine((int)(((labelWidth*(1-objectBoxWidthRatio))/2)+
+					((1-right)*objectBoxWidth)), time, 
+					(int)(((int)(((labelWidth*(1-objectBoxWidthRatio))/2)+
+							((1-right)*objectBoxWidth)))+
+							(Math.pow(-1, right)*
+									((int)callLinkCircleRadius*2))), 
+									time+((int)callLinkCircleRadius));
+			
 		}else if(call.getType().equals(CallType.CallSend)){
 			
 		}else if(call.getType().equals(CallType.CallReceive)){

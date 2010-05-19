@@ -3,11 +3,13 @@ package untraceable.view;
 public class EventTimeController {
 	
 	private final static int eventTimeGuard = 5;
+	private int previousTime;
 	private int time;
 	private final int[] eventTime = {(int)(SequenceDiagramObject.objectBoxHeigth)+
 			eventTimeGuard,(int)(SequenceDiagramObject.objectCrossHeigth)+eventTimeGuard};
 	
 	public EventTimeController(){
+		previousTime = time;
 		time = SequenceDiagramObject.northBorder;
 	}
 	
@@ -17,6 +19,7 @@ public class EventTimeController {
 		for(int i = 0; i < SequenceDiagramEvent.values().length; i++)
 			if(SequenceDiagramEvent.values()[i].equals(event))
 				index = i;
+		previousTime = time;
 		time = time + eventTime[index];
 		return drawTime;
 	}
@@ -30,6 +33,10 @@ public class EventTimeController {
 		System.out.println(e.eventTime(SequenceDiagramEvent.NewObject));
 		System.out.println(e.eventTime(SequenceDiagramEvent.NewObject));
 		System.out.println(e.eventTime(SequenceDiagramEvent.KillObject));
+	}
+
+	public int getPreviousTime() {
+		return previousTime;
 	}
 	
 }

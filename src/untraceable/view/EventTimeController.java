@@ -2,7 +2,8 @@ package untraceable.view;
 
 public class EventTimeController {
 	
-	private final static int eventTimeGuard = 5;
+	private final static float eventTimeGuardRatio = 0.03f;
+	private final static int eventTimeGuard = (int)(eventTimeGuardRatio*SequenceDiagramView.objectPanelWidth);
 	private int previousTime;
 	private int time;
 	private final int[] eventTime = {(int)(SequenceDiagramObject.objectBoxHeigth)+

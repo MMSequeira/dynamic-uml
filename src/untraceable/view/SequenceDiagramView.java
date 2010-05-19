@@ -39,7 +39,7 @@ public class SequenceDiagramView {
 	
 	private int initWindowWidth = 1024;
 	private int initWindowHeight = 700;
-	public static final int objectPanelWidth = 250;
+	public static final int objectPanelWidth = 300;
 	
 	private JFrame principalFrame = new JFrame();
 	private JPanel principalPanel = new JPanel();
@@ -81,14 +81,11 @@ public class SequenceDiagramView {
 
 		int objectID = newSequenceDiagramObjectID();
 		
-		//Test Calls
 		if(callerObjectID != -1){
 			SequenceDiagramObject callerObject = getSequenceDiagramObject(callerObjectID);
 			callerObject.newCall(eventTimeController.getCurrentTime(), 
 					CallWay.Right, CallType.NewSend);
 		}
-		//Test Calls
-		
 		
 		int initTime = eventTimeController.eventTime(SequenceDiagramEvent.NewObject);
 		//int initTime = 0;

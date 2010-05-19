@@ -39,7 +39,7 @@ public class SequenceDiagramView {
 	
 	private int initWindowWidth = 1024;
 	private int initWindowHeight = 700;
-	public static final int objectPanelWidth = 200;
+	public static final int objectPanelWidth = 250;
 	
 	private JFrame principalFrame = new JFrame();
 	private JPanel principalPanel = new JPanel();
@@ -51,7 +51,8 @@ public class SequenceDiagramView {
 	private DragAndDropController dragAndDropController = new DragAndDropController(this);
 	private EventTimeController eventTimeController = new EventTimeController();
 	
-	private LinkedList<SequenceDiagramObject> sequenceDiagramObjectList =
+	//not to be public
+	public LinkedList<SequenceDiagramObject> sequenceDiagramObjectList =
 		new LinkedList<SequenceDiagramObject>();
 	
 	private MouseListener mouseListener = new DragMouseAdapter();
@@ -79,6 +80,16 @@ public class SequenceDiagramView {
 			final int callerObjectID){
 
 		int objectID = newSequenceDiagramObjectID();
+		
+		//Test Calls
+		if(callerObjectID != -1){
+			SequenceDiagramObject callerObject = getSequenceDiagramObject(callerObjectID);
+			callerObject.newCall(eventTimeController.getCurrentTime(), 
+					CallWay.Right, CallType.NewSend);
+		}
+		//Test Calls
+		
+		
 		int initTime = eventTimeController.eventTime(SequenceDiagramEvent.NewObject);
 		//int initTime = 0;
 		SequenceDiagramObject newObject = new SequenceDiagramObject(initTime, objectName, objectClass, objectID, mouseListener, 
@@ -89,7 +100,9 @@ public class SequenceDiagramView {
 		if(principalPanel.getComponentCount() > sequenceDiagramObjectList.size())
 			principalPanel.remove(principalPanel.getComponentCount()-1);
 		//
-
+		
+		//refreshCalls();
+		passCallsIfNeeded(eventTimeController.getPreviousTime(),callerObjectID,objectID);
 		refreshObjectsLifeLines();
 		refreshContentPane();
 		return objectID;
@@ -103,6 +116,7 @@ public class SequenceDiagramView {
 		SequenceDiagramObject object = getSequenceDiagramObject(objectID);
 		if(object != null){
 			object.destruct(eventTimeController.eventTime(SequenceDiagramEvent.KillObject));
+			refreshObjectsLifeLines();
 			refreshContentPane();
 			return 1;
 		}else{
@@ -186,9 +200,22 @@ public class SequenceDiagramView {
 	
 	private void refreshObjectsLifeLines(){
 		for(SequenceDiagramObject object: sequenceDiagramObjectList){
-			object.drawObjectLifeLine();
+			object.refreshObjectLifeLine();
 		}
 	}
+	
+	/*
+	private void refreshCalls(){
+		
+	}
+	*/
+	
+	/*
+	private void refreshCallLines(final int callerObjectID){
+		SequenceDiagramObject caller = getSequenceDiagramObject(callerObjectID);
+		caller.call();
+	}
+	*/
 	
 	private void refreshContentPane(){
 		principalFrame.setContentPane(principalFrame.getContentPane());
@@ -202,6 +229,39 @@ public class SequenceDiagramView {
 		return sequenceDiagramObjectID++;
 	}
 	
+	private void passCallsIfNeeded(final int time, final int callerID, final int calleeID){
+		int numberOfComponents = sequenceDiagramObjectList.size();
+		int callerIndex = 0;
+		int calleeIndex = 0;
+		for(int i = 0; i < numberOfComponents; i++){
+			if(((SequenceDiagramObject)((principalPanel.getComponent(i)))).getID() == 
+				callerID){
+				callerIndex = i;
+			}
+			if(((SequenceDiagramObject)((principalPanel.getComponent(i)))).getID() == 
+				calleeID){
+				calleeIndex = i;
+			}
+		}
+		//tests if they objects have other objects between them
+		int difference = calleeIndex-callerIndex;
+		if(Math.abs(difference) > 1){
+			if(difference > 0){
+				for(int i = (callerIndex+1); i < calleeIndex; i++){
+					((SequenceDiagramObject)(principalPanel.getComponent(i))).
+					newCall(time, CallWay.Right, 
+							CallType.CallPass);
+				}
+			}else{
+				for(int i = (calleeIndex+1); i < callerIndex; i++){
+					((SequenceDiagramObject)(principalPanel.getComponent(i))).
+					newCall(time, CallWay.Right, 
+							CallType.CallPass);
+				}
+			}
+		}
+	}
+	
 	/**
 	 * Test main method, not used in the final version
 	 * @param args
@@ -209,18 +269,22 @@ public class SequenceDiagramView {
 	public static void main(String[] args) {
 		
 		SequenceDiagramView view = new SequenceDiagramView();
-		for(int i = 0; i < 10; i++){
-			view.createSequenceDiagramObject("Object " + (i), "Class 1", 0);
-			if(i > 3){
-				view.killSequenceDiagramObject(i-1);
-			}
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+
+		int id = view.createSequenceDiagramObject("Objecto 0", "Classe 0", -1);
+		view.createSequenceDiagramObject("Objecto 1", "Classe 1", id);
+		view.createSequenceDiagramObject("Objecto 2", "Classe 2", id);
+		view.createSequenceDiagramObject("Objecto 3", "Classe 3", id);
+		view.killSequenceDiagramObject(1);
+		view.createSequenceDiagramObject("Objecto 4", "Classe 4", id+2);
+		view.killSequenceDiagramObject(0);
+		view.killSequenceDiagramObject(2);
+		view.killSequenceDiagramObject(3);
+		view.killSequenceDiagramObject(4);
+		/*
+		for(SequenceDiagramObject o: view.sequenceDiagramObjectList){
+			o.printCalls();
 		}
-		
+		*/
 	}
 	
 	private class DragMouseAdapter extends MouseAdapter {

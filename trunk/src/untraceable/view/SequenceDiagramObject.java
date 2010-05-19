@@ -11,6 +11,7 @@ import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
+import java.util.LinkedList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -44,6 +45,7 @@ public class SequenceDiagramObject extends JLabel{
 	private DragAndDropController dragAndDropController;
 	private EventTimeController eventTimeController;
 	private RefreshingThread refreshingThread;
+	private LinkedList<SequenceDiagramCall> callList;
 	
 	private Color backgroundColor = Color.white;
 	
@@ -76,6 +78,8 @@ public class SequenceDiagramObject extends JLabel{
 		this.dragAndDropController = dragAndDropController;
 		this.eventTimeController = eventTimeController;
 		this.refreshingThread = refreshingThread;
+		callList = new LinkedList<SequenceDiagramCall>();
+		callList.add(new SequenceDiagramCall(initTime, CallWay.Right, CallType.NewReceive));
 		
 		setPreferredSize(new Dimension(labelWidth, initObjectDrawableSpaceHeigth));
 		drawableSpace = new BufferedImage(labelWidth, initObjectDrawableSpaceHeigth, BufferedImage.TYPE_INT_ARGB);
@@ -125,13 +129,8 @@ public class SequenceDiagramObject extends JLabel{
 		drawWholeObject();
 	}
 	
-	public void drawWholeObject(){
-		cleanObjectSpace();
-		drawObjectBox();
+	public void refreshObjectLifeLine(){
 		drawObjectLifeLine();
-		drawObjectControlLines();
-		if (!isAlive())
-			drawObjectDestructCross();
 	}
 	
 	public void destruct(final int destructTime){
@@ -139,10 +138,26 @@ public class SequenceDiagramObject extends JLabel{
 		drawObjectDestructCross();
 	}
 	
+	public void newCall(final int time, final CallWay way, final CallType type){
+		SequenceDiagramCall newCall = new SequenceDiagramCall(time, way, type);
+		drawCall(newCall);
+		callList.add(newCall);
+	}
+	
 	public int getID(){
 		return objectID;
 	}
 	
+	private void drawWholeObject(){
+		cleanObjectSpace();
+		drawObjectBox();
+		drawObjectLifeLine();
+		drawObjectControlLines();
+		drawObjectCalls();
+		if (!isAlive())
+			drawObjectDestructCross();
+	}
+
 	private void drawObjectBox(){
 		pen.setColor(Color.black);
 		pen.drawRect((int)(labelWidth*(1-objectBoxWidthRatio))/2, 
@@ -159,7 +174,7 @@ public class SequenceDiagramObject extends JLabel{
 		refreshDrawing();
 	}
 	
-	public void drawObjectLifeLine(){
+	private void drawObjectLifeLine(){
 		int lifeLineEndTime;
 		if(isAlive())
 			lifeLineEndTime = eventTimeController.getCurrentTime();
@@ -176,6 +191,13 @@ public class SequenceDiagramObject extends JLabel{
 		refreshDrawing();
 	}
 	
+	private void drawObjectCalls(){
+		for(SequenceDiagramCall call: callList){
+			drawCall(call);
+		}
+		refreshDrawing();
+	}
+	
 	private void drawObjectDropSelection(){
 		pen.setColor(Color.lightGray);
 		pen.fillRect(0, 1, (int)(objectBoxHeigth)/4, (int)(objectBoxHeigth)/4);
@@ -184,17 +206,6 @@ public class SequenceDiagramObject extends JLabel{
 		refreshDrawing();
 	}
 	 
-	private void cleanObjectSpace(){
-		pen.setColor(backgroundColor);
-		pen.fillRect(0, 0, labelWidth, drawableSpace.getHeight());
-		refreshDrawing();
-	}
-	
-	private void cleanObjectDropSelection(){
-		drawWholeObject();
-		refreshDrawing();
-	}
-	
 	private void drawObjectDestructCross(){
 		pen.setColor(Color.red);
 		pen.drawLine(labelWidth/2 - (int)(objectCrossWidth), destructTime, 
@@ -206,12 +217,60 @@ public class SequenceDiagramObject extends JLabel{
 		refreshDrawing();
 	}
 	
+	private void drawCall(final SequenceDiagramCall call){
+		int right = 0;
+		if(call.getWay().equals(CallWay.Right))
+			right = 1;
+		int time = call.getTime();
+		pen.setColor(Color.black);
+		if(call.getType().equals(CallType.NewSend)){
+			pen.drawLine(labelWidth/2, time, 
+					labelWidth*right, time);
+		}else if(call.getType().equals(CallType.NewReceive)){
+			pen.drawLine(labelWidth*(1-right), time, 
+					(int)(((labelWidth*(1-objectBoxWidthRatio))/2)+
+							((1-right)*objectBoxWidth)), time);
+		}else if(call.getType().equals(CallType.CallSend)){
+			
+		}else if(call.getType().equals(CallType.CallReceive)){
+			
+		}else if(call.getType().equals(CallType.ReturnSend)){
+			
+		}else if(call.getType().equals(CallType.ReturnReceive)){
+			
+		}else if(call.getType().equals(CallType.CallPass)){
+			pen.drawLine(0, time, labelWidth, time);
+		}
+		
+		
+		
+		refreshDrawing();
+	}
+
+	private void cleanObjectSpace(){
+		pen.setColor(backgroundColor);
+		pen.fillRect(0, 0, labelWidth, drawableSpace.getHeight());
+		refreshDrawing();
+	}
+	
+	private void cleanObjectDropSelection(){
+		drawWholeObject();
+		refreshDrawing();
+	}
+	
 	private boolean isAlive(){
 		return destructTime == -1;
 	}
 	
 	private void refreshDrawing(){
 		setIcon(new ImageIcon(drawableSpace));
+	}
+	
+	//not to be in the final version
+	public void printCalls(){
+		System.out.println("Object: " + objectName + " calls:");
+		for(SequenceDiagramCall c: callList)
+			System.out.println(c.toString());
 	}
 	
 	

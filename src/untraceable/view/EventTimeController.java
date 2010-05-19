@@ -6,8 +6,9 @@ public class EventTimeController {
 	private final static int eventTimeGuard = (int)(eventTimeGuardRatio*SequenceDiagramView.objectPanelWidth);
 	private int previousTime;
 	private int time;
-	private final int[] eventTime = {(int)(SequenceDiagramObject.objectBoxHeigth)+
-			eventTimeGuard,(int)(SequenceDiagramObject.objectCrossHeigth)+eventTimeGuard};
+	private final int[] eventTime = {(int)(SequenceDiagramObject.objectBoxHeigth)+eventTimeGuard,
+			(int)(SequenceDiagramObject.objectCrossHeigth)+eventTimeGuard,
+			(int)(SequenceDiagramObject.objectBoxHeigth/3)+eventTimeGuard};
 	
 	public EventTimeController(){
 		previousTime = time;

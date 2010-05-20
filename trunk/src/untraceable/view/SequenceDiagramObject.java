@@ -223,6 +223,10 @@ public class SequenceDiagramObject extends JLabel{
 	}
 	 
 	private void drawObjectDestructCross(){
+		pen.setColor(Color.black);
+		pen.drawLine(labelWidth/2, eventTimeController.getPreviousTime(), 
+				labelWidth/2, eventTimeController.getPreviousTime()+
+				(int)objectCrossHeigth/2);
 		pen.setColor(Color.red);
 		pen.drawLine(labelWidth/2 - (int)(objectCrossWidth), destructTime, 
 				labelWidth/2 + ((int)(objectCrossWidth)), 
@@ -270,10 +274,8 @@ public class SequenceDiagramObject extends JLabel{
 							(Math.pow(-1, right)*
 									((int)callLinkCircleRadius*2))), 
 									time+((int)callLinkCircleRadius));
-			pen.drawString(name+"( )", (labelWidth/2)*(1-right)+(int)callLinkCircleRadius*2, time-(int)callLinkCircleRadius);
-			
-		//}else if(call.getType().equals(CallType.CallSend)){
-			
+			pen.drawString(name+"( )", (labelWidth/2)*(1-right)+(int)objectControlLineWidth/2, time-(int)callLinkCircleRadius);
+		
 		}else if(call.getType().equals(CallType.CallReceive) || 
 				call.getType().equals(CallType.ReturnReceive)){
 			pen.drawLine(labelWidth*(1-right), time, 
@@ -284,12 +286,8 @@ public class SequenceDiagramObject extends JLabel{
 			pen.drawLine(labelWidth/2, time, (int)(labelWidth/2+
 					(Math.pow(-1, right)*((int)callLinkCircleRadius*2))), 
 					time+((int)callLinkCircleRadius));
-			pen.drawString(name+"( )", (labelWidth/2)*(1-right)+(int)callLinkCircleRadius*2, time-(int)callLinkCircleRadius);
-			
-		//}else if(call.getType().equals(CallType.ReturnSend)){
-			
-		//}else if(call.getType().equals(CallType.ReturnReceive)){
-			
+			pen.drawString(name+"( )", (labelWidth/2)*(1-right)+(int)objectControlLineWidth/2, time-(int)callLinkCircleRadius);
+		
 		}else if(call.getType().equals(CallType.CallPass)){
 			pen.drawLine(0, time, labelWidth, time);
 		}
@@ -297,12 +295,12 @@ public class SequenceDiagramObject extends JLabel{
 	}
 	
 	private void drawControlLine(SequenceDiagramObjectControlLine controlLine){
-		pen.setColor(Color.black);
+		//pen.setColor(Color.black);
 		int startTime = controlLine.getStartTime();
 		int endTime = controlLine.getEndTime();
 		if(controlLine.isActive())
 			endTime = eventTimeController.getCurrentTime();
-		pen.drawRect(labelWidth/2-(int)(objectControlLineWidth/2), startTime, (int)(objectControlLineWidth), endTime-startTime);
+		//pen.drawRect(labelWidth/2-(int)(objectControlLineWidth/2), startTime, (int)(objectControlLineWidth), endTime-startTime);
 		pen.setColor(Color.gray);
 		pen.fillRect(labelWidth/2-(int)(objectControlLineWidth/2), startTime, (int)(objectControlLineWidth), endTime-startTime);
 		refreshDrawing();

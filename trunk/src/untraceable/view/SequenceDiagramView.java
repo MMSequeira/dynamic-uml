@@ -367,8 +367,8 @@ public class SequenceDiagramView {
 		view.killSequenceDiagramObject(0);
 		view.killSequenceDiagramObject(1);
 		view.killSequenceDiagramObject(2);
-		view.printCalls();
 		
+		//view.printCalls();
 	}
 	
 	private class DragMouseAdapter extends MouseAdapter {
@@ -376,7 +376,6 @@ public class SequenceDiagramView {
             JComponent c = (JComponent) e.getSource();
             TransferHandler handler = c.getTransferHandler();
             handler.exportAsDrag(c, e, TransferHandler.COPY);
-            
         }
     }
 

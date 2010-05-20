@@ -153,7 +153,9 @@ public class SequenceDiagramObject extends JLabel{
 			SequenceDiagramObjectControlLine newControlLine = new SequenceDiagramObjectControlLine(time);
 			controlLineList.add(newControlLine);
 		}else if(type.equals(CallType.ReturnSend)){
-			controlLineList.getLast().setEndTime(time);
+			SequenceDiagramObjectControlLine lastActiveControlLine = 
+				getLastActiveControlLine();
+			lastActiveControlLine.setEndTime(time);
 		}
 		drawObjectControlLines();
 		drawObjectCalls();
@@ -253,8 +255,16 @@ public class SequenceDiagramObject extends JLabel{
 			pen.fillOval(labelWidth/2-(int)callLinkCircleRadius, 
 					time-(int)callLinkCircleRadius, (int)callLinkCircleRadius*2, 
 					(int)callLinkCircleRadius*2);
-			pen.drawLine(labelWidth/2, time, 
-					labelWidth*right, time);
+			if(!call.getWay().equals(CallWay.Self)){
+				pen.drawLine(labelWidth/2, time, 
+						labelWidth*right, time);
+			}else{
+				pen.setColor(Color.red);
+				pen.drawLine(labelWidth/2, time, 
+						((labelWidth/4)*3), time);
+				pen.drawString(name+"( )", (labelWidth/2)+(int)(objectControlLineWidth/2), 
+						time-(int)callLinkCircleRadius);
+			}
 			
 		}else if(call.getType().equals(CallType.NewReceive)){
 			pen.drawLine(labelWidth*(1-right), time, 
@@ -278,6 +288,18 @@ public class SequenceDiagramObject extends JLabel{
 		
 		}else if(call.getType().equals(CallType.CallReceive) || 
 				call.getType().equals(CallType.ReturnReceive)){
+			//
+			//
+			//  SO FALTA ESTE
+			//
+			if(!call.getWay().equals(CallWay.Self)){
+				pen.drawString(name+"( )", (labelWidth/2)*(1-right)+
+						(int)objectControlLineWidth/2, 
+						time-(int)callLinkCircleRadius);
+			}else{
+				right = 0;
+				time = time+(int)callLinkCircleRadius;
+			}
 			pen.drawLine(labelWidth*(1-right), time, 
 					labelWidth/2, time);
 			pen.drawLine(labelWidth/2, time, (int)(labelWidth/2+
@@ -286,8 +308,6 @@ public class SequenceDiagramObject extends JLabel{
 			pen.drawLine(labelWidth/2, time, (int)(labelWidth/2+
 					(Math.pow(-1, right)*((int)callLinkCircleRadius*2))), 
 					time+((int)callLinkCircleRadius));
-			pen.drawString(name+"( )", (labelWidth/2)*(1-right)+(int)objectControlLineWidth/2, time-(int)callLinkCircleRadius);
-		
 		}else if(call.getType().equals(CallType.CallPass)){
 			pen.drawLine(0, time, labelWidth, time);
 		}
@@ -295,13 +315,13 @@ public class SequenceDiagramObject extends JLabel{
 	}
 	
 	private void drawControlLine(SequenceDiagramObjectControlLine controlLine){
-		//pen.setColor(Color.black);
+		pen.setColor(Color.gray);
 		int startTime = controlLine.getStartTime();
 		int endTime = controlLine.getEndTime();
 		if(controlLine.isActive())
 			endTime = eventTimeController.getCurrentTime();
-		//pen.drawRect(labelWidth/2-(int)(objectControlLineWidth/2), startTime, (int)(objectControlLineWidth), endTime-startTime);
-		pen.setColor(Color.gray);
+		pen.drawRect(labelWidth/2-(int)(objectControlLineWidth/2), startTime, (int)(objectControlLineWidth), endTime-startTime);
+		pen.setColor(Color.lightGray);
 		pen.fillRect(labelWidth/2-(int)(objectControlLineWidth/2), startTime, (int)(objectControlLineWidth), endTime-startTime);
 		refreshDrawing();
 	}
@@ -319,6 +339,16 @@ public class SequenceDiagramObject extends JLabel{
 	
 	private boolean isAlive(){
 		return destructTime == -1;
+	}
+	
+	private SequenceDiagramObjectControlLine getLastActiveControlLine(){
+		SequenceDiagramObjectControlLine lastActiveControlLine = null;
+		for(SequenceDiagramObjectControlLine cl: controlLineList){
+			if(cl.isActive()){
+				lastActiveControlLine = cl;
+			}
+		}
+		return lastActiveControlLine;
 	}
 	
 	private void refreshDrawing(){

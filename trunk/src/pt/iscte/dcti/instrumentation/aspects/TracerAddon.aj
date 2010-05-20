@@ -1,9 +1,8 @@
 package pt.iscte.dcti.instrumentation.aspects;
 
 import java.util.HashMap;
-
 import untraceable.view.SequenceDiagramView;
-//import java.io.;
+
 public privileged aspect TracerAddon extends AbstractTracer {
 	
 	private final boolean DISPLAY_CONSOLE_MESSAGES = true;
@@ -17,8 +16,7 @@ public privileged aspect TracerAddon extends AbstractTracer {
 	}
 	
 	//POINTCUTs
-	public pointcut codeInsideMyProject() : within((pt.iscte.dcti.instrumentation..* || pt.iscte.dcti.visual_tracer..* || untraceable.*..*) && !pt.iscte.dcti.instrumentation.examples..*) || cflow(execution(String *.toString()));
-	//private pointcut codeInsideMyProject() : within((pt.iscte.dcti.instrumentation..* || pt.iscte.dcti.visual_tracer..* || untraceable.*..*) && !pt.iscte.dcti.instrumentation.examples..*);
+	public pointcut codeInsideMyProject() : within(pt.iscte.dcti.instrumentation..* || pt.iscte.dcti.visual_tracer..* || untraceable.*..*) || cflow(execution(String *.toString()));
 	
 	//private pointcut weavableClass() : within(examples..*);
 

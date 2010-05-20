@@ -259,7 +259,6 @@ public class SequenceDiagramObject extends JLabel{
 				pen.drawLine(labelWidth/2, time, 
 						labelWidth*right, time);
 			}else{
-				pen.setColor(Color.red);
 				pen.drawLine(labelWidth/2, time, 
 						((labelWidth/4)*3), time);
 				pen.drawString(name+"( )", (labelWidth/2)+(int)(objectControlLineWidth/2), 
@@ -288,20 +287,20 @@ public class SequenceDiagramObject extends JLabel{
 		
 		}else if(call.getType().equals(CallType.CallReceive) || 
 				call.getType().equals(CallType.ReturnReceive)){
-			//
-			//
-			//  SO FALTA ESTE
-			//
 			if(!call.getWay().equals(CallWay.Self)){
 				pen.drawString(name+"( )", (labelWidth/2)*(1-right)+
 						(int)objectControlLineWidth/2, 
 						time-(int)callLinkCircleRadius);
+				pen.drawLine(labelWidth*(1-right), time, 
+						labelWidth/2, time);
 			}else{
 				right = 0;
-				time = time+(int)callLinkCircleRadius;
+				int time0 = time;
+				time = time+(int)callLinkCircleRadius*2;
+				pen.drawLine(labelWidth/2, time, 
+						((labelWidth/4)*3), time);
+				pen.drawLine(((labelWidth/4)*3), time0, ((labelWidth/4)*3), time);
 			}
-			pen.drawLine(labelWidth*(1-right), time, 
-					labelWidth/2, time);
 			pen.drawLine(labelWidth/2, time, (int)(labelWidth/2+
 					(Math.pow(-1, right)*((int)callLinkCircleRadius*2))), 
 					time-((int)callLinkCircleRadius));
@@ -315,14 +314,14 @@ public class SequenceDiagramObject extends JLabel{
 	}
 	
 	private void drawControlLine(SequenceDiagramObjectControlLine controlLine){
-		pen.setColor(Color.gray);
 		int startTime = controlLine.getStartTime();
 		int endTime = controlLine.getEndTime();
 		if(controlLine.isActive())
 			endTime = eventTimeController.getCurrentTime();
-		pen.drawRect(labelWidth/2-(int)(objectControlLineWidth/2), startTime, (int)(objectControlLineWidth), endTime-startTime);
 		pen.setColor(Color.lightGray);
 		pen.fillRect(labelWidth/2-(int)(objectControlLineWidth/2), startTime, (int)(objectControlLineWidth), endTime-startTime);
+		pen.setColor(Color.gray);
+		pen.drawRect(labelWidth/2-(int)(objectControlLineWidth/2), startTime, (int)(objectControlLineWidth), endTime-startTime);
 		refreshDrawing();
 	}
 

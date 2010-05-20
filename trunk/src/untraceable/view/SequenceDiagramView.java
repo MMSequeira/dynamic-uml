@@ -39,7 +39,7 @@ public class SequenceDiagramView {
 	
 	private int initWindowWidth = 1024;
 	private int initWindowHeight = 700;
-	public static final int objectPanelWidth = 500;
+	public static final int objectPanelWidth = 250;
 	
 	private JFrame principalFrame = new JFrame();
 	private JPanel principalPanel = new JPanel();
@@ -54,6 +54,7 @@ public class SequenceDiagramView {
 	//not to be public
 	public LinkedList<SequenceDiagramObject> sequenceDiagramObjectList =
 		new LinkedList<SequenceDiagramObject>();
+	//not to be public
 	private LinkedList<SequenceDiagramCall> sequenceDiagramCallList =
 		new LinkedList<SequenceDiagramCall>();
 	
@@ -94,15 +95,18 @@ public class SequenceDiagramView {
 		if(principalPanel.getComponentCount() > sequenceDiagramObjectList.size())
 			principalPanel.remove(principalPanel.getComponentCount()-1);
 		//
-		
-		//refreshCalls();
-		if(callerObjectID != -1){
-			sequenceDiagramCallList.add(new SequenceDiagramCall(callID, "new", 
-					getSequenceDiagramObject(callerObjectID), newObject, initTime, CallWay.Right));
-			SequenceDiagramObject callerObject = getSequenceDiagramObject(callerObjectID);
+		SequenceDiagramObject callerObject;
+		if(callerObjectID >= 0 && callerObjectID <= sequenceDiagramObjectID){
+			callerObject = getSequenceDiagramObject(callerObjectID);
 			callerObject.newCall("new",eventTimeController.getPreviousTime(), 
 					CallWay.Right, CallType.NewSend);
+		}else{
+			callerObject = null;
 		}
+		sequenceDiagramCallList.add(new SequenceDiagramCall(callID, "new", 
+				getSequenceDiagramObject(callerObjectID), newObject, initTime, 
+				CallWay.Right));
+		
 		passCallsIfNeeded(eventTimeController.getPreviousTime(),callerObjectID,objectID);
 		refreshObjectsLifeLines();
 		refreshContentPane();
@@ -127,12 +131,17 @@ public class SequenceDiagramView {
 	
 	public int createCall(final String methodName, final int callerID, final int calleeID){
 		int callID = newSequenceDiagramCallID();
-		SequenceDiagramObject caller = getSequenceDiagramObject(callerID);
+		SequenceDiagramObject caller;
+		int callerIndex;
+		if(callerID >= 0 && callerID <= sequenceDiagramObjectID){
+			caller = getSequenceDiagramObject(callerID);
+			callerIndex = getSequenceDiagramObjectIndex(callerID);
+		}else{
+			caller = null;
+			callerIndex = -1;
+		}
 		SequenceDiagramObject callee = getSequenceDiagramObject(calleeID);
-		
-		
 		int callTime = eventTimeController.eventTime(SequenceDiagramEvent.Call);
-		int callerIndex = getSequenceDiagramObjectIndex(callerID);
 		int calleeIndex = getSequenceDiagramObjectIndex(calleeID);
 		CallWay way;
 		if(callerIndex < calleeIndex){
@@ -146,7 +155,8 @@ public class SequenceDiagramView {
 		SequenceDiagramCall newCall = new SequenceDiagramCall(callID, methodName, 
 				caller, callee, callTime, way);
 		sequenceDiagramCallList.add(newCall);
-		caller.newCall(methodName, callTime, way, CallType.CallSend);
+		if(callerID >= 0 && callerID <= sequenceDiagramObjectID)
+			caller.newCall(methodName, callTime, way, CallType.CallSend);
 		callee.newCall(methodName, callTime, way, CallType.CallReceive);
 		passCallsIfNeeded(callTime, callerID, calleeID);
 		
@@ -169,9 +179,15 @@ public class SequenceDiagramView {
 			SequenceDiagramCall newCall = new SequenceDiagramCall(newCallID, methodName, 
 					newCaller, newCallee, callTime, callWay);
 			sequenceDiagramCallList.add(newCall);
-			newCaller.newCall("return from "+methodName, callTime, callWay, CallType.ReturnSend);
-			newCallee.newCall("return from "+methodName, callTime, callWay, CallType.ReturnReceive);
-			passCallsIfNeeded(callTime, newCaller.getID(), newCallee.getID());
+			newCaller.newCall("return "+methodName, callTime, callWay, CallType.ReturnSend);
+			int calleeID;
+			if(newCallee != null){
+				newCallee.newCall("return "+methodName, callTime, callWay, CallType.ReturnReceive);
+				calleeID = newCallee.getID();
+			}else{
+				calleeID = -1;
+			}
+			passCallsIfNeeded(callTime, newCaller.getID(), calleeID);
 			return 1;
 		}else{
 			return -1;
@@ -322,12 +338,10 @@ public class SequenceDiagramView {
 		
 		SequenceDiagramView view = new SequenceDiagramView();
 
-		view.createSequenceDiagramObject("Objecto 0", "Classe 0", -1);
+		/*view.createSequenceDiagramObject("Objecto 0", "Classe 0", -1);
 		view.createSequenceDiagramObject("Objecto 1", "Classe 1", 0);
 		view.createSequenceDiagramObject("Objecto 2", "Classe 2", 1);
 		view.createSequenceDiagramObject("Objecto 3", "Classe 3", 2);
-		/*view.killSequenceDiagramObject(1);
-		view.createSequenceDiagramObject("Objecto 4", "Classe 4", id+2);*/
 		int callID = view.createCall("coiso", 2, 3);
 		view.createReturn(callID);
 		callID = view.createCall("coisinho", 0, 3);
@@ -335,12 +349,26 @@ public class SequenceDiagramView {
 		view.killSequenceDiagramObject(0);
 		view.killSequenceDiagramObject(1);
 		view.killSequenceDiagramObject(2);
-		view.killSequenceDiagramObject(3);
-		/*
-		for(SequenceDiagramObject o: view.sequenceDiagramObjectList){
-			o.printCalls();
-		}
-		*/
+		view.killSequenceDiagramObject(3);*/
+
+		view.createSequenceDiagramObject("Objecto 0", "Classe 0", -1);
+		view.createSequenceDiagramObject("Objecto 1", "Classe 1", -1);
+		view.createSequenceDiagramObject("Objecto 2", "Classe 2", 1);
+		
+		int callID0 = view.createCall("funcao0", -1, 1);
+		int callID1 = view.createCall("funcao1", 1, 2);
+		view.createReturn(callID1);
+		int callID2 = view.createCall("funcao2", 1, 2);
+		view.createReturn(callID2);
+		view.createReturn(callID0);
+		int callID3 = view.createCall("funcao3", -1, 2);
+		view.createReturn(callID3);
+		
+		view.killSequenceDiagramObject(0);
+		view.killSequenceDiagramObject(1);
+		view.killSequenceDiagramObject(2);
+		view.printCalls();
+		
 	}
 	
 	private class DragMouseAdapter extends MouseAdapter {
@@ -382,6 +410,13 @@ public class SequenceDiagramView {
 		}
 		
 		refreshContentPane();
+	}
+	
+	//not to be in the final version
+	public void printCalls(){
+		for(SequenceDiagramCall c: sequenceDiagramCallList){
+			System.out.println(c.toString());
+		}
 	}
 	
 }

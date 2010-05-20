@@ -2,13 +2,13 @@ package untraceable.view;
 
 public class EventTimeController {
 	
-	private final static float eventTimeGuardRatio = 0.03f;
+	private final static float eventTimeGuardRatio = 0.05f;
 	private final static int eventTimeGuard = (int)(eventTimeGuardRatio*SequenceDiagramView.objectPanelWidth);
 	private int previousTime;
 	private int time;
 	private final int[] eventTime = {(int)(SequenceDiagramObject.objectBoxHeigth)+eventTimeGuard,
 			(int)(SequenceDiagramObject.objectCrossHeigth)+eventTimeGuard,
-			(int)(SequenceDiagramObject.objectBoxHeigth/3)+eventTimeGuard};
+			(int)(SequenceDiagramObject.objectBoxHeigth/2)+eventTimeGuard};
 	
 	public EventTimeController(){
 		previousTime = time;

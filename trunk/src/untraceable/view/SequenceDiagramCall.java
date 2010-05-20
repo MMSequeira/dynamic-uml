@@ -54,4 +54,18 @@ public class SequenceDiagramCall {
 		returned = true;
 	}
 	
+	public String toString(){
+		String callerString;
+		if(caller == null)
+			callerString = "Main";
+		else
+			callerString = ""+caller.getID();
+		String calleeString;
+		if(caller == null)
+			calleeString = "Main";
+		else
+			calleeString = ""+caller.getID();
+		return "CallID: " + callID + "; \tCallerID: " + callerString + "; \tCalleeID: " + calleeString + " \tMethodName: " + methodName;
+	}
+	
 }

@@ -31,12 +31,14 @@ public class SequenceDiagramObject extends JLabel{
 	private static final float objectCrossWidthRatio = objectBoxHeigthRatio/2;
 	private static final float objectCrossHeigthRatio = objectBoxHeigthRatio/2;
 	private static final float callLinkCircleRatio = 0.015f;
+	private static final float objectControlLineWidthRatio = 0.1f;
 	
 	private static final float objectBoxWidth = objectBoxWidthRatio*SequenceDiagramView.objectPanelWidth;
 	public static final float objectBoxHeigth = objectBoxHeigthRatio*SequenceDiagramView.objectPanelWidth;
 	private static final float objectCrossWidth = objectCrossWidthRatio*SequenceDiagramView.objectPanelWidth;
 	public static final float objectCrossHeigth = objectCrossHeigthRatio*SequenceDiagramView.objectPanelWidth;
 	private static final float callLinkCircleRadius = callLinkCircleRatio*SequenceDiagramView.objectPanelWidth;
+	private static final float objectControlLineWidth = objectControlLineWidthRatio*SequenceDiagramView.objectPanelWidth;
 	
 	private int labelWidth;
 	private int initTime = 0;
@@ -48,6 +50,7 @@ public class SequenceDiagramObject extends JLabel{
 	private EventTimeController eventTimeController;
 	private RefreshingThread refreshingThread;
 	private LinkedList<SequenceDiagramObjectCall> callList;
+	private LinkedList<SequenceDiagramObjectControlLine> controlLineList;
 	
 	private Color backgroundColor = Color.white;
 	
@@ -81,6 +84,7 @@ public class SequenceDiagramObject extends JLabel{
 		this.eventTimeController = eventTimeController;
 		this.refreshingThread = refreshingThread;
 		callList = new LinkedList<SequenceDiagramObjectCall>();
+		controlLineList = new LinkedList<SequenceDiagramObjectControlLine>();
 		callList.add(new SequenceDiagramObjectCall("new", initTime, CallWay.Right, CallType.NewReceive));
 		
 		setPreferredSize(new Dimension(labelWidth, initObjectDrawableSpaceHeigth));
@@ -142,8 +146,17 @@ public class SequenceDiagramObject extends JLabel{
 	
 	public void newCall(final String callName, final int time, final CallWay way, final CallType type){
 		SequenceDiagramObjectCall newCall = new SequenceDiagramObjectCall(callName, time, way, type);
-		drawCall(newCall);
+		//drawCall(newCall);
 		callList.add(newCall);
+		
+		if(type.equals(CallType.CallReceive)){
+			SequenceDiagramObjectControlLine newControlLine = new SequenceDiagramObjectControlLine(time);
+			controlLineList.add(newControlLine);
+		}else if(type.equals(CallType.ReturnSend)){
+			controlLineList.getLast().setEndTime(time);
+		}
+		drawObjectControlLines();
+		drawObjectCalls();
 	}
 	
 	public int getID(){
@@ -189,7 +202,8 @@ public class SequenceDiagramObject extends JLabel{
 	}
 	
 	private void drawObjectControlLines(){
-		
+		for(SequenceDiagramObjectControlLine controlLine: controlLineList)
+			drawControlLine(controlLine);
 		refreshDrawing();
 	}
 	
@@ -279,9 +293,18 @@ public class SequenceDiagramObject extends JLabel{
 		}else if(call.getType().equals(CallType.CallPass)){
 			pen.drawLine(0, time, labelWidth, time);
 		}
-		
-		
-		
+		refreshDrawing();
+	}
+	
+	private void drawControlLine(SequenceDiagramObjectControlLine controlLine){
+		pen.setColor(Color.black);
+		int startTime = controlLine.getStartTime();
+		int endTime = controlLine.getEndTime();
+		if(controlLine.isActive())
+			endTime = eventTimeController.getCurrentTime();
+		pen.drawRect(labelWidth/2-(int)(objectControlLineWidth/2), startTime, (int)(objectControlLineWidth), endTime-startTime);
+		pen.setColor(Color.gray);
+		pen.fillRect(labelWidth/2-(int)(objectControlLineWidth/2), startTime, (int)(objectControlLineWidth), endTime-startTime);
 		refreshDrawing();
 	}
 

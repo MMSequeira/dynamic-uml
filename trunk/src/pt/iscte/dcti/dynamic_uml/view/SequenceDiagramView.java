@@ -86,7 +86,6 @@ public class SequenceDiagramView {
 		int callID = newSequenceDiagramCallID();
 		
 		int initTime = eventTimeController.eventTime(SequenceDiagramEvent.NewObject);
-		//int initTime = 0;
 		SequenceDiagramObject newObject = new SequenceDiagramObject(initTime, objectName, objectClass, objectID, mouseListener, 
 				dragAndDropController, eventTimeController, refreshingThread);
 		sequenceDiagramObjectList.add(newObject);
@@ -174,8 +173,10 @@ public class SequenceDiagramView {
 			CallWay callWay = call.getCallWay();
 			if(callWay.equals(CallWay.Right))
 				callWay = CallWay.Left;
-			else
+			else if (callWay.equals(CallWay.Left))
 				callWay = CallWay.Right;
+			else
+				callWay = CallWay.Self;
 			SequenceDiagramCall newCall = new SequenceDiagramCall(newCallID, methodName, 
 					newCaller, newCallee, callTime, callWay);
 			sequenceDiagramCallList.add(newCall);
@@ -358,6 +359,8 @@ public class SequenceDiagramView {
 		int callID0 = view.createCall("funcao0", -1, 1);
 		int callID1 = view.createCall("funcao1", 1, 2);
 		view.createReturn(callID1);
+		int callID4 = view.createCall("funcao2", 1, 1);
+		view.createReturn(callID4);
 		int callID2 = view.createCall("funcao2", 1, 2);
 		view.createReturn(callID2);
 		view.createReturn(callID0);

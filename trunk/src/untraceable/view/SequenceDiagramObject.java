@@ -24,7 +24,7 @@ public class SequenceDiagramObject extends JLabel{
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	public static final int initObjectDrawableSpaceHeigth = 6000;
+	public static final int initObjectDrawableSpaceHeigth = 3000;
 	public static final int northBorder = 20;
 	private static final float objectBoxWidthRatio = 0.5f;
 	private static final float objectBoxHeigthRatio = objectBoxWidthRatio/2;
@@ -226,7 +226,9 @@ public class SequenceDiagramObject extends JLabel{
 		int time = call.getTime();
 		String name = call.getName();
 		pen.setColor(Color.black);
-		if(call.getType().equals(CallType.NewSend) || call.getType().equals(CallType.CallSend)){
+		if(call.getType().equals(CallType.NewSend) || 
+				call.getType().equals(CallType.CallSend) || 
+				call.getType().equals(CallType.ReturnSend)){
 			pen.drawOval(labelWidth/2-(int)callLinkCircleRadius, 
 					time-(int)callLinkCircleRadius, (int)callLinkCircleRadius*2, 
 					(int)callLinkCircleRadius*2);
@@ -254,11 +256,12 @@ public class SequenceDiagramObject extends JLabel{
 							(Math.pow(-1, right)*
 									((int)callLinkCircleRadius*2))), 
 									time+((int)callLinkCircleRadius));
-			pen.drawString(name+"( )", (labelWidth/2)*(1-right)+(int)callLinkCircleRadius*2, time-3);
+			pen.drawString(name+"( )", (labelWidth/2)*(1-right)+(int)callLinkCircleRadius*2, time-(int)callLinkCircleRadius);
 			
 		//}else if(call.getType().equals(CallType.CallSend)){
 			
-		}else if(call.getType().equals(CallType.CallReceive)){
+		}else if(call.getType().equals(CallType.CallReceive) || 
+				call.getType().equals(CallType.ReturnReceive)){
 			pen.drawLine(labelWidth*(1-right), time, 
 					labelWidth/2, time);
 			pen.drawLine(labelWidth/2, time, (int)(labelWidth/2+
@@ -267,11 +270,11 @@ public class SequenceDiagramObject extends JLabel{
 			pen.drawLine(labelWidth/2, time, (int)(labelWidth/2+
 					(Math.pow(-1, right)*((int)callLinkCircleRadius*2))), 
 					time+((int)callLinkCircleRadius));
-			pen.drawString(name+"( )", (labelWidth/2)*(1-right)+(int)callLinkCircleRadius*2, time-3);
+			pen.drawString(name+"( )", (labelWidth/2)*(1-right)+(int)callLinkCircleRadius*2, time-(int)callLinkCircleRadius);
 			
-		}else if(call.getType().equals(CallType.ReturnSend)){
+		//}else if(call.getType().equals(CallType.ReturnSend)){
 			
-		}else if(call.getType().equals(CallType.ReturnReceive)){
+		//}else if(call.getType().equals(CallType.ReturnReceive)){
 			
 		}else if(call.getType().equals(CallType.CallPass)){
 			pen.drawLine(0, time, labelWidth, time);

@@ -146,7 +146,7 @@ public privileged aspect TracerAddon extends AbstractTracer {
 		
 		//Diagram IDs
 		int diagram_id_this;
-		if(id_this == 0 || id_this == id_system_in || id_this == id_system_out || id_this == id_system_err) //No object associated... static main method... or System object
+		if(id_this == 0) //No object associated... static main method... or System object
 			diagram_id_this = -1; //Value for the static main class ID
 		else
 			diagram_id_this = hash_map.get(id_this);

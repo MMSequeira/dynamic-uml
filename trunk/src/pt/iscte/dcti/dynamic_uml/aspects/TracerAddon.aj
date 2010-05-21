@@ -56,6 +56,13 @@ public privileged aspect TracerAddon extends AbstractTracer {
 		// TODO If the object calls methods within himself, upon construction, how will we deal with this in the diagrams, if we haven't got a System.identityHashCode for the object yet, before it's construction is complete?
 		Object object = proceed();
 		int id_object = System.identityHashCode(object);
+		
+		int id_creator = System.identityHashCode(thisJoinPoint.getThis());
+		int diagram_id_creator;
+		if(id_creator == 0)
+			diagram_id_creator = SYSTEM_OBJECT_NUMBER_ID;
+		else
+			diagram_id_creator = hash_map.get(id_creator);
 		//System.out.println("id: "+id_object);
 		
 		String object_class_name = object.getClass().getName();
@@ -64,7 +71,7 @@ public privileged aspect TracerAddon extends AbstractTracer {
 		if(!(object instanceof Enum<?>)) {
 			if(DISPLAY_CONSOLE_MESSAGES)
 				System.out.println("--Constructor Call-- "+object.toString());
-			int id = sequence_diagram_view.createSequenceDiagramObject(object.toString(), object_class_name, 0);
+			int id = sequence_diagram_view.createSequenceDiagramObject(object.toString(), object_class_name, diagram_id_creator);
 			hash_map.put(System.identityHashCode(object), id);
 		}
 		

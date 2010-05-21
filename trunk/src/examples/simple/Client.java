@@ -13,6 +13,7 @@ public class Client {
 	
 	public void think() {
 		thoughts_taken++;
+		System.out.println("Bob thought...");
 	}
 	
 	public void askAttention() {

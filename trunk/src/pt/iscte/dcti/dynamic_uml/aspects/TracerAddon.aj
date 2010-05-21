@@ -1,14 +1,13 @@
 package pt.iscte.dcti.dynamic_uml.aspects;
 
 import java.util.HashMap;
-
 import pt.iscte.dcti.dynamic_uml.view.SequenceDiagramView;
 import pt.iscte.dcti.instrumentation.aspects.AbstractTracer;
 
 public privileged aspect TracerAddon extends AbstractTracer {
 	
 	private final boolean DISPLAY_CONSOLE_MESSAGES = true;
-	private final int SYSTEM_OBJECT_NUMBER_ID = -2;
+	private final int SYSTEM_OBJECT_NUMBER_ID = -1;
 	
 	private SequenceDiagramView sequence_diagram_view;
 	private HashMap<Integer, Integer> hash_map;
@@ -106,7 +105,7 @@ public privileged aspect TracerAddon extends AbstractTracer {
 		
 		//Diagram IDs
 		int diagram_id_this;
-		if(id_this == 0 || id_this == id_system_in || id_this == id_system_out || id_this == id_system_err) //No object associated... static main method... or System object
+		if(id_this == 0) //No object associated... static main method...
 			diagram_id_this = -1; //Value for the static main class ID
 		else
 			diagram_id_this = hash_map.get(id_this);
@@ -120,18 +119,15 @@ public privileged aspect TracerAddon extends AbstractTracer {
 		
 		//System.out.println("Corrected Method - Hashmap<System.code, id> -> this: "+diagram_id_this+" , target: "+diagram_id_target);
 		int method_call = 0;
-		boolean id_is_not_system_call = (diagram_id_this != -1 && diagram_id_target != -1);
-		boolean id_is_not_system_object = (diagram_id_this != id_system_in && diagram_id_this != id_system_out && diagram_id_this != id_system_err
-				&& diagram_id_target != id_system_in && diagram_id_target != id_system_out && diagram_id_target != id_system_err);
-		boolean id_is_valid = id_is_not_system_call && id_is_not_system_object;
-		if(id_is_valid)
+		boolean id_is_not_from_system = (diagram_id_this != SYSTEM_OBJECT_NUMBER_ID && diagram_id_target != SYSTEM_OBJECT_NUMBER_ID);
+		if(id_is_not_from_system)
 			method_call = sequence_diagram_view.createCall(thisJoinPoint.getSignature().getName(), diagram_id_this, diagram_id_target);
 		if(DISPLAY_CONSOLE_MESSAGES) {
 			System.out.println("--METHOD CALL--");
 			System.out.println("The object: "+thisJoinPoint.getThis()+" with sequence id: "+hash_map.get(id_this)+" called method: "+thisJoinPoint.getSignature()+" from object: "+thisJoinPoint.getTarget()+" with sequence id: "+hash_map.get(id_target));
 		}
 		proceed();
-		if(id_is_valid)
+		if(id_is_not_from_system)
 			sequence_diagram_view.createReturn(method_call);
 	}
 	
@@ -157,18 +153,15 @@ public privileged aspect TracerAddon extends AbstractTracer {
 		
 		//System.out.println("Corrected Function - Hashmap<System.code, id> -> this: "+diagram_id_this+" , target: "+diagram_id_target);
 		int function_call = 0;
-		boolean id_is_not_system_call = (diagram_id_this != -1 && diagram_id_target != -1);
-		boolean id_is_not_system_object = (diagram_id_this != id_system_in && diagram_id_this != id_system_out && diagram_id_this != id_system_err
-				&& diagram_id_target != id_system_in && diagram_id_target != id_system_out && diagram_id_target != id_system_err);
-		boolean id_is_valid = id_is_not_system_call && id_is_not_system_object;
-		if(id_is_valid)
+		boolean id_is_not_from_system = (diagram_id_this != SYSTEM_OBJECT_NUMBER_ID && diagram_id_target != SYSTEM_OBJECT_NUMBER_ID);
+		if(id_is_not_from_system)
 			function_call = sequence_diagram_view.createCall(thisJoinPoint.getSignature().getName(), diagram_id_this, diagram_id_target);	
 		if(DISPLAY_CONSOLE_MESSAGES) {
 			System.out.println("--FUNCTION CALL--");
 			System.out.println("The object: "+thisJoinPoint.getThis()+" with sequence id: "+hash_map.get(id_this)+" called function: "+thisJoinPoint.getSignature()+" from object: "+thisJoinPoint.getTarget()+" with sequence id: "+hash_map.get(id_target));
 		}
 		Object object = proceed();
-		if(id_is_valid)
+		if(id_is_not_from_system)
 			sequence_diagram_view.createReturn(function_call);
 		
 		return object;

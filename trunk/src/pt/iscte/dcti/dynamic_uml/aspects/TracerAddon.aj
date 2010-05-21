@@ -126,7 +126,7 @@ public privileged aspect TracerAddon extends AbstractTracer {
 		
 		//System.out.println("Corrected Method - Hashmap<System.code, id> -> this: "+diagram_id_this+" , target: "+diagram_id_target);
 		int method_call = 0;
-		boolean id_is_not_from_system = (diagram_id_this != SYSTEM_OBJECT_NUMBER_ID && diagram_id_target != SYSTEM_OBJECT_NUMBER_ID);
+		boolean id_is_not_from_system = (diagram_id_this != SYSTEM_OBJECT_NUMBER_ID || diagram_id_target != SYSTEM_OBJECT_NUMBER_ID);
 		if(id_is_not_from_system)
 			method_call = sequence_diagram_view.createCall(thisJoinPoint.getSignature().getName(), diagram_id_this, diagram_id_target);
 		if(DISPLAY_CONSOLE_MESSAGES) {
@@ -160,7 +160,7 @@ public privileged aspect TracerAddon extends AbstractTracer {
 		
 		//System.out.println("Corrected Function - Hashmap<System.code, id> -> this: "+diagram_id_this+" , target: "+diagram_id_target);
 		int function_call = 0;
-		boolean id_is_not_from_system = (diagram_id_this != SYSTEM_OBJECT_NUMBER_ID && diagram_id_target != SYSTEM_OBJECT_NUMBER_ID);
+		boolean id_is_not_from_system = (diagram_id_this != SYSTEM_OBJECT_NUMBER_ID || diagram_id_target != SYSTEM_OBJECT_NUMBER_ID);
 		if(id_is_not_from_system)
 			function_call = sequence_diagram_view.createCall(thisJoinPoint.getSignature().getName(), diagram_id_this, diagram_id_target);	
 		if(DISPLAY_CONSOLE_MESSAGES) {

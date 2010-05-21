@@ -343,9 +343,7 @@ public class SequenceDiagramView {
 		view.createSequenceDiagramObject("Objecto 1", "Classe 1", 0);
 		view.createSequenceDiagramObject("Objecto 2", "Classe 2", 1);
 		view.createSequenceDiagramObject("Objecto 3", "Classe 3", 2);
-		int callID = view.createCall("coiso", 2, 3);
-		view.createReturn(callID);
-		callID = view.createCall("coisinho", 0, 3);
+		int callID = view.createCall("coisinho", 0, 3);
 		view.createReturn(callID);
 		view.killSequenceDiagramObject(0);
 		view.killSequenceDiagramObject(1);
@@ -360,11 +358,13 @@ public class SequenceDiagramView {
 		int callID1 = view.createCall("funcao1", 1, 2);
 		view.createReturn(callID1);
 		int callID4 = view.createCall("funcao2", 1, 1);
+		int callID6 = view.createCall("funcao6", 1, 2);
+		int callID5 = view.createCall("funcao5", 2, 1);
+		view.createReturn(callID5);
+		view.createReturn(callID6);
 		view.createReturn(callID4);
 		int callID2 = view.createCall("funcao3", 1, 2);
 		view.createReturn(callID2);
-		int callID5 = view.createCall("funcao5", 2, 1);
-		view.createReturn(callID5);
 		
 		view.createReturn(callID0);
 		int callID3 = view.createCall("funcao4", -1, 2);

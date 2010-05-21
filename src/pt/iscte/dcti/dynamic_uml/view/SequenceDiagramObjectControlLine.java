@@ -4,10 +4,12 @@ public class SequenceDiagramObjectControlLine {
 	
 	private int startTime;
 	private int endTime;
+	private int activeCalls;
 	
-	public SequenceDiagramObjectControlLine(final int startTime) {
+	public SequenceDiagramObjectControlLine(final int startTime, final int activeCalls) {
 		this.startTime = startTime;
 		this.endTime = -1;
+		this.activeCalls = activeCalls;
 	}
 	
 	public int getStartTime(){
@@ -16,6 +18,10 @@ public class SequenceDiagramObjectControlLine {
 	
 	public int getEndTime(){
 		return endTime;
+	}
+	
+	public int getActiveCalls(){
+		return activeCalls;
 	}
 	
 	public boolean isActive(){

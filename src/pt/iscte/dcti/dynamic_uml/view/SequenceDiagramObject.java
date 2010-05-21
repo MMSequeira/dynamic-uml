@@ -51,6 +51,7 @@ public class SequenceDiagramObject extends JLabel{
 	private RefreshingThread refreshingThread;
 	private LinkedList<SequenceDiagramObjectCall> callList;
 	private LinkedList<SequenceDiagramObjectControlLine> controlLineList;
+	private int activeCalls = 0;
 	
 	private Color backgroundColor = Color.white;
 	
@@ -148,13 +149,13 @@ public class SequenceDiagramObject extends JLabel{
 		SequenceDiagramObjectCall newCall = new SequenceDiagramObjectCall(callName, time, way, type);
 		//drawCall(newCall);
 		callList.add(newCall);
-		
 		if(type.equals(CallType.CallReceive)){
-			SequenceDiagramObjectControlLine newControlLine = new SequenceDiagramObjectControlLine(time);
+			SequenceDiagramObjectControlLine newControlLine = new SequenceDiagramObjectControlLine(time,activeCalls++);
 			controlLineList.add(newControlLine);
 		}else if(type.equals(CallType.ReturnSend)){
 			SequenceDiagramObjectControlLine lastActiveControlLine = 
 				getLastActiveControlLine();
+			activeCalls--;
 			lastActiveControlLine.setEndTime(time);
 		}
 		drawObjectControlLines();
@@ -316,12 +317,13 @@ public class SequenceDiagramObject extends JLabel{
 	private void drawControlLine(SequenceDiagramObjectControlLine controlLine){
 		int startTime = controlLine.getStartTime();
 		int endTime = controlLine.getEndTime();
+		int activeCalls = controlLine.getActiveCalls();
 		if(controlLine.isActive())
 			endTime = eventTimeController.getCurrentTime();
 		pen.setColor(Color.lightGray);
-		pen.fillRect(labelWidth/2-(int)(objectControlLineWidth/2), startTime, (int)(objectControlLineWidth), endTime-startTime);
+		pen.fillRect(labelWidth/2-(int)(objectControlLineWidth/2)+((int)(objectControlLineWidth/2)*activeCalls), startTime, (int)(objectControlLineWidth), endTime-startTime);
 		pen.setColor(Color.gray);
-		pen.drawRect(labelWidth/2-(int)(objectControlLineWidth/2), startTime, (int)(objectControlLineWidth), endTime-startTime);
+		pen.drawRect(labelWidth/2-(int)(objectControlLineWidth/2)+((int)(objectControlLineWidth/2)*activeCalls), startTime, (int)(objectControlLineWidth), endTime-startTime);
 		refreshDrawing();
 	}
 
@@ -341,10 +343,12 @@ public class SequenceDiagramObject extends JLabel{
 	}
 	
 	private SequenceDiagramObjectControlLine getLastActiveControlLine(){
+		//activeCalls = 0;
 		SequenceDiagramObjectControlLine lastActiveControlLine = null;
 		for(SequenceDiagramObjectControlLine cl: controlLineList){
 			if(cl.isActive()){
 				lastActiveControlLine = cl;
+				//activeCalls++;
 			}
 		}
 		return lastActiveControlLine;

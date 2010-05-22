@@ -24,7 +24,7 @@ public class SequenceDiagramObject extends JLabel{
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	public static final int initObjectDrawableSpaceHeigth = 3000;
+	public static final int initObjectDrawableSpaceHeigth = 1000;
 	public static final int northBorder = 20;
 	private static final float objectBoxWidthRatio = 0.5f;
 	private static final float objectBoxHeigthRatio = objectBoxWidthRatio/2;
@@ -88,8 +88,8 @@ public class SequenceDiagramObject extends JLabel{
 		controlLineList = new LinkedList<SequenceDiagramObjectControlLine>();
 		callList.add(new SequenceDiagramObjectCall("new", initTime, CallWay.Right, CallType.NewReceive));
 		
-		setPreferredSize(new Dimension(labelWidth, initObjectDrawableSpaceHeigth));
-		drawableSpace = new BufferedImage(labelWidth, initObjectDrawableSpaceHeigth, BufferedImage.TYPE_INT_ARGB);
+		setPreferredSize(new Dimension(labelWidth, eventTimeController.getSequenceDiagramObjectDrawableSpaceHeigth()));
+		drawableSpace = new BufferedImage(labelWidth, eventTimeController.getSequenceDiagramObjectDrawableSpaceHeigth(), BufferedImage.TYPE_INT_ARGB);
 		setIcon(new ImageIcon(drawableSpace));
 		pen = (Graphics2D)drawableSpace.getGraphics();
 		
@@ -220,7 +220,7 @@ public class SequenceDiagramObject extends JLabel{
 	private void drawObjectDropSelection(){
 		pen.setColor(Color.lightGray);
 		pen.fillRect(0, 1, (int)(objectBoxHeigth)/4, (int)(objectBoxHeigth)/4);
-		pen.drawLine(0, 1, 0, (int)(initObjectDrawableSpaceHeigth));
+		pen.drawLine(0, 1, 0, (int)(eventTimeController.getSequenceDiagramObjectDrawableSpaceHeigth()));
 		pen.drawLine(0, 1, (int)(objectBoxWidth), 1);
 		refreshDrawing();
 	}
@@ -356,6 +356,14 @@ public class SequenceDiagramObject extends JLabel{
 	
 	private void refreshDrawing(){
 		setIcon(new ImageIcon(drawableSpace));
+	}
+	
+	public void setNewDrawableSpaceSize(){
+		int newHeigth = eventTimeController.getSequenceDiagramObjectDrawableSpaceHeigth();
+		setPreferredSize(new Dimension(labelWidth, newHeigth));
+		drawableSpace = new BufferedImage(labelWidth, newHeigth, BufferedImage.TYPE_INT_ARGB);
+		pen = (Graphics2D)drawableSpace.getGraphics();
+		drawWholeObject();
 	}
 	
 	//not to be in the final version

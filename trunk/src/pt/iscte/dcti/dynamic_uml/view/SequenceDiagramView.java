@@ -48,15 +48,15 @@ public class SequenceDiagramView {
 	private RefreshingThread refreshingThread;
 	private boolean enableRefreshingThread = false;
 	
-	private DragAndDropController dragAndDropController = new DragAndDropController(this);
-	private EventTimeController eventTimeController = new EventTimeController();
-	
 	//not to be public
 	public LinkedList<SequenceDiagramObject> sequenceDiagramObjectList =
 		new LinkedList<SequenceDiagramObject>();
 	//not to be public
 	private LinkedList<SequenceDiagramCall> sequenceDiagramCallList =
 		new LinkedList<SequenceDiagramCall>();
+	
+	private DragAndDropController dragAndDropController = new DragAndDropController(this);
+	private EventTimeController eventTimeController = new EventTimeController(sequenceDiagramObjectList);
 	
 	private MouseListener mouseListener = new DragMouseAdapter();
 	
@@ -224,10 +224,10 @@ public class SequenceDiagramView {
 		BufferedImage padImage = new BufferedImage(objectPanelWidth,1000,BufferedImage.TYPE_INT_ARGB);
 		Graphics2D pen = (Graphics2D)padImage.getGraphics();
 		pen.setColor(Color.white);
-		pen.fillRect(0, 0, objectPanelWidth, SequenceDiagramObject.initObjectDrawableSpaceHeigth);
+		pen.fillRect(0, 0, objectPanelWidth, eventTimeController.getSequenceDiagramObjectDrawableSpaceHeigth());
 		for (int i = 0; i < (int)(initWindowWidth/objectPanelWidth); i++){
 			padLabel = new JLabel(new ImageIcon(padImage));
-			padLabel.setPreferredSize(new Dimension(objectPanelWidth, SequenceDiagramObject.initObjectDrawableSpaceHeigth));
+			padLabel.setPreferredSize(new Dimension(objectPanelWidth, eventTimeController.getSequenceDiagramObjectDrawableSpaceHeigth()));
 			principalPanel.add(padLabel);
 		}
 		//
@@ -353,18 +353,6 @@ public class SequenceDiagramView {
 	public static void main(String[] args) {
 		
 		SequenceDiagramView view = new SequenceDiagramView();
-
-		/*view.createSequenceDiagramObject("Objecto 0", "Classe 0", -1);
-		view.createSequenceDiagramObject("Objecto 1", "Classe 1", 0);
-		view.createSequenceDiagramObject("Objecto 2", "Classe 2", 1);
-		view.createSequenceDiagramObject("Objecto 3", "Classe 3", 2);
-		int callID = view.createCall("coisinho", 0, 3);
-		view.createReturn(callID);
-		view.killSequenceDiagramObject(0);
-		view.killSequenceDiagramObject(1);
-		view.killSequenceDiagramObject(2);
-		view.killSequenceDiagramObject(3);*/
-
 		view.createSequenceDiagramObject("Objecto 0", "Classe 0", -1);
 		view.createSequenceDiagramObject("Objecto 1", "Classe 1", -1);
 		view.createSequenceDiagramObject("Objecto 2", "Classe 2", 1);
@@ -390,6 +378,19 @@ public class SequenceDiagramView {
 		view.killSequenceDiagramObject(0);
 		view.killSequenceDiagramObject(1);
 		view.killSequenceDiagramObject(2);
+		
+		view.createSequenceDiagramObject("Objecto 3", "Classe 3", -1);
+		view.createSequenceDiagramObject("Objecto 4", "Classe 4", 3);
+		
+		int callID9 = view.createCall("Funcao", -1, 3);
+		int callID8 = view.createCall("Funcao", 3, 4);
+		view.createReturn(view.createCall("Funcao", 4, 3));
+		view.createReturn(callID8);
+		view.createReturn(callID9);
+		
+		
+		view.killSequenceDiagramObject(3);
+		view.killSequenceDiagramObject(4);
 		
 		//view.printCalls();
 	}

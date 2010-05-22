@@ -22,6 +22,10 @@ public class EventTimeController {
 	}
 	
 	public int eventTime(final SequenceDiagramEvent event){
+		if(time > sequenceDiagramObjectDrawableSpaceHeigth){
+			sequenceDiagramObjectDrawableSpaceHeigth = (int)(sequenceDiagramObjectDrawableSpaceHeigth*sequenceDiagramObjectDrawableSpaceGrowthRatio);
+			refreshObjectsDrawableSpace();
+		}
 		int drawTime = time;
 		int index = 0;
 		for(int i = 0; i < SequenceDiagramEvent.values().length; i++)
@@ -29,10 +33,6 @@ public class EventTimeController {
 				index = i;
 		previousTime = time;
 		time = time + eventTime[index];
-		if(time > sequenceDiagramObjectDrawableSpaceHeigth){
-			sequenceDiagramObjectDrawableSpaceHeigth = (int)(sequenceDiagramObjectDrawableSpaceHeigth*sequenceDiagramObjectDrawableSpaceGrowthRatio);
-			refreshObjectsDrawableSpace();
-		}
 		return drawTime;
 	}
 

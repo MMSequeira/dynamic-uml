@@ -39,7 +39,7 @@ public class SequenceDiagramView {
 	
 	private int initWindowWidth = 1024;
 	private int initWindowHeight = 700;
-	public static final int objectPanelWidth = 250;
+	public static final int objectPanelWidth = 300;
 	
 	private JFrame principalFrame = new JFrame();
 	private JPanel principalPanel = new JPanel();
@@ -387,7 +387,6 @@ public class SequenceDiagramView {
 		view.createReturn(view.createCall("Funcao", 4, 3));
 		view.createReturn(callID8);
 		view.createReturn(callID9);
-		
 		
 		view.killSequenceDiagramObject(3);
 		view.killSequenceDiagramObject(4);

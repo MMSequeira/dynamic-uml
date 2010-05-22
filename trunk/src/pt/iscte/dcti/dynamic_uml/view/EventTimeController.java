@@ -49,9 +49,8 @@ public class EventTimeController {
 	}
 	
 	private void refreshObjectsDrawableSpace() {
-		for(SequenceDiagramObject obj: sequenceDiagramObjectList){
+		for(SequenceDiagramObject obj: sequenceDiagramObjectList)
 			obj.setNewDrawableSpaceSize();
-		}
 	}
 	
 }

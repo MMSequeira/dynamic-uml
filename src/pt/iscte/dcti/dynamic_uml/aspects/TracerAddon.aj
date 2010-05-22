@@ -78,19 +78,22 @@ public privileged aspect TracerAddon extends AbstractTracer {
 		return object;
 	}
 	
-	/*
+	
 	after() : constructorExecution() {
 		Object object = thisJoinPoint.getThis();
 		int id = System.identityHashCode(object);
 		
 		//String object_class_name = object.getClass().getName();
 		//Class class_type = object.getClass();
+		
+		//System.out.println("A Constructor of object "+object+" was executed, and his id is "+id);
 		if(!hash_map.containsKey(id)) {
+			//System.out.println("Last mentioned id was added to the hashmap");
 			//sequence_diagram_view.createSequenceDiagramObject(object.toString(), object_class_name, SYSTEM_OBJECT_NUMBER_ID);
-			//hash_map.put(System.identityHashCode(thisJoinPoint.getThis()), SYSTEM_OBJECT_NUMBER_ID);
+			hash_map.put(System.identityHashCode(thisJoinPoint.getThis()), SYSTEM_OBJECT_NUMBER_ID);
 		}
 	}
-*/
+
 	//--Catch Finalize Calls--
 	//TODO Remove usage of package (examples..*)
 	declare parents: !(!(examples..*)||hasmethod(public void finalize()) || Enum+ ) implements HandledFinalize;
@@ -112,9 +115,12 @@ public privileged aspect TracerAddon extends AbstractTracer {
 	private pointcut functionCalls() : call(* *..*(..)) && !methodCalls() && !codeInsideMyProject();
 	
 	void around() : methodCalls() { //&& !within(java.lang.*) { //&& !execution(* *..System..*(..)) { //&& !cflow(execution(* *..System..*(..))) { //!withincode(* *..System..*(..)) {
+		//System.out.println("METHOD DEBUG POINT");
+		
 		//System IDs
 		int id_this = System.identityHashCode(thisJoinPoint.getThis());
 		int id_target = System.identityHashCode(thisJoinPoint.getTarget());
+		//System.out.println("Method - System IDs - id_this = "+id_this+" id_target = "+id_target);
 		//System.out.println("Method - Hashmap<System.code, id> , and the get returned-> this: "+hash_map.get(id_this)+" , target: "+hash_map.get(id_target));
 		
 		//Diagram IDs
@@ -135,10 +141,10 @@ public privileged aspect TracerAddon extends AbstractTracer {
 		int method_call = 0;
 		boolean id_is_not_from_system = (diagram_id_this != SYSTEM_OBJECT_NUMBER_ID || diagram_id_target != SYSTEM_OBJECT_NUMBER_ID);
 		if(id_is_not_from_system) {
-			System.out.println("----CREATING NEW METHOD CALL IN DIAGRAM----");
-			System.out.println("I will call .createCall("+thisJoinPoint.getSignature().getName()+", "+diagram_id_this+", "+diagram_id_target+")");
+			//System.out.println("----CREATING NEW METHOD CALL IN DIAGRAM----");
+			//System.out.println("I will call .createCall("+thisJoinPoint.getSignature().getName()+", "+diagram_id_this+", "+diagram_id_target+")");
 			method_call = sequence_diagram_view.createCall(thisJoinPoint.getSignature().getName(), diagram_id_this, diagram_id_target);
-			System.out.println("-FINISHED-");
+			//System.out.println("-FINISHED-");
 		} 
 		if(DISPLAY_CONSOLE_MESSAGES) {
 			System.out.println("--METHOD CALL--");
@@ -148,12 +154,17 @@ public privileged aspect TracerAddon extends AbstractTracer {
 		//System.out.println("Finished that method's proceed...");
 		if(id_is_not_from_system)
 			sequence_diagram_view.createReturn(method_call);
+		
+		//System.out.println("METHOD DEBUG POINT END");
 	}
 	
 	Object around() : functionCalls() {
+		//System.out.println("FUNCTION DEBUG POINT");
+		
 		//System IDs
 		int id_this = System.identityHashCode(thisJoinPoint.getThis());
 		int id_target = System.identityHashCode(thisJoinPoint.getTarget());
+		//System.out.println("Function - System IDs - id_this = "+id_this+" id_target = "+id_target);
 		//System.out.println("Function - Hashmap<System.code, id> , and the get returned-> this: "+hash_map.get(id_this)+" , target: "+hash_map.get(id_target));
 		
 		//Diagram IDs
@@ -182,7 +193,7 @@ public privileged aspect TracerAddon extends AbstractTracer {
 		Object object = proceed();
 		if(id_is_not_from_system)
 			sequence_diagram_view.createReturn(function_call);
-		
+		//System.out.println("FUNCTION DEBUG POINT END");
 		return object;
 		
 	}

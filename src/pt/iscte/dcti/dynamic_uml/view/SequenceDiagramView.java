@@ -129,9 +129,12 @@ public class SequenceDiagramView {
 	}
 	
 	public int createCall(final String methodName, final int callerID, final int calleeID){
+		//The callee must accept -1 also
 		int callID = newSequenceDiagramCallID();
 		SequenceDiagramObject caller;
+		SequenceDiagramObject callee;
 		int callerIndex;
+		int calleeIndex;
 		if(callerID >= 0 && callerID <= sequenceDiagramObjectID){
 			caller = getSequenceDiagramObject(callerID);
 			callerIndex = getSequenceDiagramObjectIndex(callerID);
@@ -139,9 +142,14 @@ public class SequenceDiagramView {
 			caller = null;
 			callerIndex = -1;
 		}
-		SequenceDiagramObject callee = getSequenceDiagramObject(calleeID);
+		if(calleeID >= 0 && calleeID <= sequenceDiagramObjectID){
+			callee = getSequenceDiagramObject(calleeID);
+			calleeIndex = getSequenceDiagramObjectIndex(calleeID);
+		}else{
+			callee = null;
+			calleeIndex = -1;
+		}
 		int callTime = eventTimeController.eventTime(SequenceDiagramEvent.Call);
-		int calleeIndex = getSequenceDiagramObjectIndex(calleeID);
 		CallWay way;
 		if(callerIndex < calleeIndex){
 			way = CallWay.Right;
@@ -156,7 +164,8 @@ public class SequenceDiagramView {
 		sequenceDiagramCallList.add(newCall);
 		if(callerID >= 0 && callerID <= sequenceDiagramObjectID)
 			caller.newCall(methodName, callTime, way, CallType.CallSend);
-		callee.newCall(methodName, callTime, way, CallType.CallReceive);
+		if(calleeID >= 0 && calleeID <= sequenceDiagramObjectID)
+			callee.newCall(methodName, callTime, way, CallType.CallReceive);
 		passCallsIfNeeded(callTime, callerID, calleeID);
 		
 		return callID;
@@ -180,7 +189,13 @@ public class SequenceDiagramView {
 			SequenceDiagramCall newCall = new SequenceDiagramCall(newCallID, methodName, 
 					newCaller, newCallee, callTime, callWay);
 			sequenceDiagramCallList.add(newCall);
-			newCaller.newCall("return "+methodName, callTime, callWay, CallType.ReturnSend);
+			int callerID;
+			if(newCaller != null){
+				newCaller.newCall("return "+methodName, callTime, callWay, CallType.ReturnSend);
+				callerID = newCaller.getID();
+			}else{
+				callerID = -1;
+			}
 			int calleeID;
 			if(newCallee != null){
 				newCallee.newCall("return "+methodName, callTime, callWay, CallType.ReturnReceive);
@@ -188,7 +203,7 @@ public class SequenceDiagramView {
 			}else{
 				calleeID = -1;
 			}
-			passCallsIfNeeded(callTime, newCaller.getID(), calleeID);
+			passCallsIfNeeded(callTime, callerID, calleeID);
 			return 1;
 		}else{
 			return -1;
@@ -368,6 +383,8 @@ public class SequenceDiagramView {
 		
 		view.createReturn(callID0);
 		int callID3 = view.createCall("funcao4", -1, 2);
+		int callID7 = view.createCall("funcaoMain", 2, -1);
+		view.createReturn(callID7);
 		view.createReturn(callID3);
 		
 		view.killSequenceDiagramObject(0);

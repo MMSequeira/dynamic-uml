@@ -30,8 +30,4 @@ public class SequenceDiagramObjectCall {
 		return type;
 	}
 	
-	public String toString(){
-		return "------\nTime: " + time + "\nWay: " + way + "\nType: " + type + "\n------";
-	}
-	
 }

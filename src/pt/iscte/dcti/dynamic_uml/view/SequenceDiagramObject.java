@@ -54,7 +54,6 @@ public class SequenceDiagramObject extends JLabel{
 	
 	private Color backgroundColor = Color.white;
 	
-	//private Container drawableSpace;
 	private Graphics2D pen;
 	private BufferedImage drawableSpace;
 	
@@ -91,7 +90,6 @@ public class SequenceDiagramObject extends JLabel{
 		setIcon(new ImageIcon(drawableSpace));
 		pen = (Graphics2D)drawableSpace.getGraphics();
 		
-		//setName(""+objectID);
 		addMouseListener(mouseListener);
 		setTransferHandler(new TransferHandler("icon"));
 		setDropTarget(new DropTarget(this, new DropTargetListener() {
@@ -136,7 +134,6 @@ public class SequenceDiagramObject extends JLabel{
 	
 	public void newCall(final String callName, final int time, final CallWay way, final CallType type){
 		SequenceDiagramObjectCall newCall = new SequenceDiagramObjectCall(callName, time, way, type);
-		//drawCall(newCall);
 		callList.add(newCall);
 		if(type.equals(CallType.CallReceive)){
 			SequenceDiagramObjectControlLine newControlLine = new SequenceDiagramObjectControlLine(time,activeCalls++,way);
@@ -215,10 +212,6 @@ public class SequenceDiagramObject extends JLabel{
 	}
 	 
 	private void drawObjectDestructCross(){
-		/*pen.setColor(Color.black);
-		pen.drawLine(labelWidth/2, eventTimeController.getPreviousTime(), 
-				labelWidth/2, eventTimeController.getPreviousTime()+
-				(int)objectCrossHeigth/2);*/
 		pen.setColor(Color.red);
 		pen.drawLine(labelWidth/2 - (int)(objectCrossWidth), destructTime-(int)(objectCrossHeigth)/2, 
 				labelWidth/2 + ((int)(objectCrossWidth)), 
@@ -338,10 +331,8 @@ public class SequenceDiagramObject extends JLabel{
 		//activeCalls = 0;
 		SequenceDiagramObjectControlLine lastActiveControlLine = null;
 		for(SequenceDiagramObjectControlLine cl: controlLineList){
-			if(cl.isActive()){
+			if(cl.isActive())
 				lastActiveControlLine = cl;
-				//activeCalls++;
-			}
 		}
 		return lastActiveControlLine;
 	}
@@ -357,13 +348,5 @@ public class SequenceDiagramObject extends JLabel{
 		pen = (Graphics2D)drawableSpace.getGraphics();
 		drawWholeObject();
 	}
-	
-	//not to be in the final version
-	public void printCalls(){
-		System.out.println("Object: " + objectName + " calls:");
-		for(SequenceDiagramObjectCall c: callList)
-			System.out.println(c.toString());
-	}
-	
 	
 }

@@ -7,8 +7,6 @@ import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
 import java.util.LinkedList;
 
@@ -44,10 +42,8 @@ public class SequenceDiagramView {
 	private JPanel principalPanel = new JPanel();
 	private JScrollPane scroll;
 	
-	//not to be public
-	public LinkedList<SequenceDiagramObject> sequenceDiagramObjectList =
+	private LinkedList<SequenceDiagramObject> sequenceDiagramObjectList =
 		new LinkedList<SequenceDiagramObject>();
-	//not to be public
 	private LinkedList<SequenceDiagramCall> sequenceDiagramCallList =
 		new LinkedList<SequenceDiagramCall>();
 	
@@ -120,7 +116,6 @@ public class SequenceDiagramView {
 	}
 	
 	public int createCall(final String methodName, final int callerID, final int calleeID){
-		//The callee must accept -1 also
 		int callID = newSequenceDiagramCallID();
 		SequenceDiagramObject caller;
 		SequenceDiagramObject callee;
@@ -205,7 +200,6 @@ public class SequenceDiagramView {
 	 * Configures primary window
 	 */
 	private void initialization(){
-		addWindowListenerToPrincipalFrame();
 		principalFrame.setTitle(frameName);
 		principalFrame.setSize(initWindowWidth, initWindowHeight);
 		principalFrame.setLayout(new GridLayout(1,1));
@@ -252,45 +246,6 @@ public class SequenceDiagramView {
 			if (call.getID() == callID)
 				return call;
 		return null;
-	}
-	
-	/**
-	 * Adds a window specific windows listened to the principal frame
-	 */
-	private void addWindowListenerToPrincipalFrame() {
-		principalFrame.addWindowListener(new WindowListener() {
-			
-			@Override
-			public void windowOpened(WindowEvent e) {
-			}
-			@Override
-			public void windowIconified(WindowEvent e) {
-			}
-			
-			@Override
-			public void windowDeiconified(WindowEvent e) {
-			}
-			
-			@Override
-			public void windowDeactivated(WindowEvent e) {
-			}
-			
-			@Override
-			public void windowClosing(WindowEvent e) {
-			}
-			
-			@Override
-			public void windowClosed(WindowEvent e) {
-				/*
-				refreshingThread.frameAliveness(false);
-				*/
-			}
-			
-			@Override
-			public void windowActivated(WindowEvent e) {
-			}
-		});
-		
 	}
 	
 	private void refreshObjectsLifeLines(){
@@ -347,7 +302,6 @@ public class SequenceDiagramView {
 		view.createSequenceDiagramObject("Objecto 0", "Classe 0", -1);
 		view.createSequenceDiagramObject("Objecto 1", "Classe 1", -1);
 		view.createSequenceDiagramObject("Objecto 2", "Classe 2", 1);
-		
 		int callID0 = view.createCall("funcao0", -1, 1);
 		int callID1 = view.createCall("funcao1", 1, 2);
 		view.createReturn(callID1);
@@ -361,30 +315,24 @@ public class SequenceDiagramView {
 		view.createReturn(callID4);
 		int callID2 = view.createCall("funcao3", 1, 2);
 		view.createReturn(callID2);
-		
 		view.createReturn(callID0);
 		int callID3 = view.createCall("funcao4", -1, 2);
 		int callID7 = view.createCall("funcaoMain", 2, -1);
 		view.createReturn(callID7);
 		view.createReturn(callID3);
-		
 		view.killSequenceDiagramObject(0);
 		view.killSequenceDiagramObject(1);
 		view.killSequenceDiagramObject(2);
-		
 		view.createSequenceDiagramObject("Objecto 3", "Classe 3", -1);
 		view.createSequenceDiagramObject("Objecto 4", "Classe 4", 3);
-		
 		int callID9 = view.createCall("Funcao", -1, 3);
 		int callID8 = view.createCall("Funcao", 3, 4);
 		view.createReturn(view.createCall("Funcao", 4, 3));
 		view.createReturn(callID8);
 		view.createReturn(callID9);
-		
 		view.killSequenceDiagramObject(3);
 		view.killSequenceDiagramObject(4);
-		
-		//view.printCalls();
+
 	}
 	
 	private class DragMouseAdapter extends MouseAdapter {
@@ -428,13 +376,6 @@ public class SequenceDiagramView {
 	private void addaptDiagramToChanges(final int indexDrag, final int indexDrop) {
 		// TODO This method will re-ajust call and control lines after they've been moved
 		JOptionPane.showMessageDialog(null, "The rearrangement of the call lines after moving object is not implemented.\nPlease but back the object in the original place.");
-	}
-
-	//not to be in the final version
-	public void printCalls(){
-		for(SequenceDiagramCall c: sequenceDiagramCallList){
-			System.out.println(c.toString());
-		}
 	}
 	
 }

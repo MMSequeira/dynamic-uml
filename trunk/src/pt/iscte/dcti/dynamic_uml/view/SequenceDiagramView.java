@@ -35,7 +35,6 @@ public class SequenceDiagramView {
 	private static int sequenceDiagramCallID = 0;
 	private final String frameName = "DynamicUML - Sequence Diagram";
 	private boolean isVisibleOnInit = true;
-	private long refreshStep = 300;
 	
 	private int initWindowWidth = 1024;
 	private int initWindowHeight = 700;
@@ -44,9 +43,6 @@ public class SequenceDiagramView {
 	private JFrame principalFrame = new JFrame();
 	private JPanel principalPanel = new JPanel();
 	private JScrollPane scroll;
-	
-	private RefreshingThread refreshingThread;
-	private boolean enableRefreshingThread = false;
 	
 	//not to be public
 	public LinkedList<SequenceDiagramObject> sequenceDiagramObjectList =
@@ -65,11 +61,6 @@ public class SequenceDiagramView {
 	 */
 	public SequenceDiagramView (){
 		initialization();
-		if(enableRefreshingThread){
-			refreshingThread = new RefreshingThread(sequenceDiagramObjectList, refreshStep, 
-					principalFrame);
-			refreshingThread.start();
-		}
 	}
 	
 	/**
@@ -87,7 +78,7 @@ public class SequenceDiagramView {
 		
 		int initTime = eventTimeController.eventTime(SequenceDiagramEvent.NewObject);
 		SequenceDiagramObject newObject = new SequenceDiagramObject(initTime, objectName, objectClass, objectID, mouseListener, 
-				dragAndDropController, eventTimeController, refreshingThread);
+				dragAndDropController, eventTimeController);
 		sequenceDiagramObjectList.add(newObject);
 		principalPanel.add(newObject, objectID);
 		//Remove jlabels padding as needed
@@ -362,7 +353,9 @@ public class SequenceDiagramView {
 		view.createReturn(callID1);
 		int callID4 = view.createCall("funcao2", 1, 1);
 		int callID6 = view.createCall("funcao6", 1, 2);
+		view.createReturn(view.createCall("Test", 2, 2));
 		int callID5 = view.createCall("funcao5", 2, 1);
+		view.createReturn(view.createCall("TestLeftControlLine", 1, 2));
 		view.createReturn(callID5);
 		view.createReturn(callID6);
 		view.createReturn(callID4);
@@ -424,16 +417,19 @@ public class SequenceDiagramView {
 			if(gotDrag && gotDrop)
 				i = numberOfComponents;
 		}
-		System.out.println("Drag index " + indexDrag + " on index " + indexDrop);
-		if(draggedObject != null){
+		if(draggedObject != null)
 			principalPanel.add(draggedObject, indexDrop);
-		}else{
-			JOptionPane.showMessageDialog(null, "Error: Drag and Drop");
-		}
-		
+		else
+			JOptionPane.showMessageDialog(null, "Fatal Error: Drag and Drop");
+		addaptDiagramToChanges(indexDrag,indexDrop);
 		refreshContentPane();
 	}
 	
+	private void addaptDiagramToChanges(final int indexDrag, final int indexDrop) {
+		// TODO This method will re-ajust call and control lines after they've been moved
+		JOptionPane.showMessageDialog(null, "The rearrangement of the call lines after moving object is not implemented.\nPlease but back the object in the original place.");
+	}
+
 	//not to be in the final version
 	public void printCalls(){
 		for(SequenceDiagramCall c: sequenceDiagramCallList){

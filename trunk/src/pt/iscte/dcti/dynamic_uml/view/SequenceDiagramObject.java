@@ -226,17 +226,17 @@ public class SequenceDiagramObject extends JLabel{
 	}
 	 
 	private void drawObjectDestructCross(){
-		pen.setColor(Color.black);
+		/*pen.setColor(Color.black);
 		pen.drawLine(labelWidth/2, eventTimeController.getPreviousTime(), 
 				labelWidth/2, eventTimeController.getPreviousTime()+
-				(int)objectCrossHeigth/2);
+				(int)objectCrossHeigth/2);*/
 		pen.setColor(Color.red);
-		pen.drawLine(labelWidth/2 - (int)(objectCrossWidth), destructTime, 
+		pen.drawLine(labelWidth/2 - (int)(objectCrossWidth), destructTime-(int)(objectCrossHeigth)/2, 
 				labelWidth/2 + ((int)(objectCrossWidth)), 
-				(destructTime) + ((int)(objectCrossHeigth)));
+				(destructTime) + ((int)(objectCrossHeigth)/2));
 		pen.drawLine(labelWidth/2 - (int)(objectCrossWidth), (destructTime) + 
-				((int)(objectCrossHeigth)), labelWidth/2 + ((int)(objectCrossWidth)), 
-				destructTime);
+				((int)(objectCrossHeigth)/2), labelWidth/2 + ((int)(objectCrossWidth)), 
+				destructTime-(int)(objectCrossHeigth)/2);
 		refreshDrawing();
 	}
 	

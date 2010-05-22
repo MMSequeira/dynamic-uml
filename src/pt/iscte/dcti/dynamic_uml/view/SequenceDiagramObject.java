@@ -48,7 +48,6 @@ public class SequenceDiagramObject extends JLabel{
 	private int objectID;
 	private DragAndDropController dragAndDropController;
 	private EventTimeController eventTimeController;
-	private RefreshingThread refreshingThread;
 	private LinkedList<SequenceDiagramObjectCall> callList;
 	private LinkedList<SequenceDiagramObjectControlLine> controlLineList;
 	private int activeCalls = 0;
@@ -75,7 +74,7 @@ public class SequenceDiagramObject extends JLabel{
 	public SequenceDiagramObject(final int initTime,
 			final String objectName, final String objectClass, final int objectID, 
 			final MouseListener mouseListener, final DragAndDropController dragAndDropController, 
-			final EventTimeController eventTimeController, final RefreshingThread refreshingThread) {
+			final EventTimeController eventTimeController) {
 		this.labelWidth = SequenceDiagramView.objectPanelWidth;
 		this.initTime = initTime;
 		this.objectName = objectName;
@@ -83,7 +82,6 @@ public class SequenceDiagramObject extends JLabel{
 		this.objectID = objectID;
 		this.dragAndDropController = dragAndDropController;
 		this.eventTimeController = eventTimeController;
-		this.refreshingThread = refreshingThread;
 		callList = new LinkedList<SequenceDiagramObjectCall>();
 		controlLineList = new LinkedList<SequenceDiagramObjectControlLine>();
 		callList.add(new SequenceDiagramObjectCall("new", initTime, CallWay.Right, CallType.NewReceive));
@@ -106,11 +104,7 @@ public class SequenceDiagramObject extends JLabel{
 			public void drop(DropTargetDropEvent event) {
 				cleanObjectDropSelection();
 				dragAndDropController.setDropItem(objectID);
-				System.out.println("Sou o " + objectID + "/" + 
-						dragAndDropController.getDropItem() + " e droparam-me em cima o " + 
-						dragAndDropController.getDragItem());
 				dragAndDropController.reset();
-				//refreshingThread.refreshPrincipalFrame();
 			}
 			
 			@Override
@@ -119,18 +113,13 @@ public class SequenceDiagramObject extends JLabel{
 			
 			@Override
 			public void dragExit(DropTargetEvent event) {
-				System.out.println("Saí do " + objectID);
 				cleanObjectDropSelection();
-				//refreshingThread.refreshPrincipalFrame();
 			}
 			
 			@Override
 			public void dragEnter(DropTargetDragEvent event) {
-				System.out.println("Entrei no " + objectID);
 				drawObjectDropSelection();
 				dragAndDropController.setDragItem(objectID);
-				System.out.println("Pegaste no " + dragAndDropController.getDragItem());
-				//refreshingThread.refreshPrincipalFrame();
 			}
 		}));
 		drawWholeObject();
@@ -150,7 +139,7 @@ public class SequenceDiagramObject extends JLabel{
 		//drawCall(newCall);
 		callList.add(newCall);
 		if(type.equals(CallType.CallReceive)){
-			SequenceDiagramObjectControlLine newControlLine = new SequenceDiagramObjectControlLine(time,activeCalls++);
+			SequenceDiagramObjectControlLine newControlLine = new SequenceDiagramObjectControlLine(time,activeCalls++,way);
 			controlLineList.add(newControlLine);
 		}else if(type.equals(CallType.ReturnSend)){
 			SequenceDiagramObjectControlLine lastActiveControlLine = 
@@ -320,10 +309,13 @@ public class SequenceDiagramObject extends JLabel{
 		int activeCalls = controlLine.getActiveCalls();
 		if(controlLine.isActive())
 			endTime = eventTimeController.getCurrentTime();
+		int right = 1;
+		if(controlLine.getCallWay().equals(CallWay.Left) || controlLine.getCallWay().equals(CallWay.Self))
+			right = 0;
 		pen.setColor(Color.lightGray);
-		pen.fillRect(labelWidth/2-(int)(objectControlLineWidth/2)+((int)(objectControlLineWidth/2)*activeCalls), startTime, (int)(objectControlLineWidth), endTime-startTime);
+		pen.fillRect(labelWidth/2-(int)(objectControlLineWidth/2)+((int)Math.pow(-1, right)*((int)(objectControlLineWidth/2)*activeCalls)), startTime, (int)(objectControlLineWidth), endTime-startTime);
 		pen.setColor(Color.gray);
-		pen.drawRect(labelWidth/2-(int)(objectControlLineWidth/2)+((int)(objectControlLineWidth/2)*activeCalls), startTime, (int)(objectControlLineWidth), endTime-startTime);
+		pen.drawRect(labelWidth/2-(int)(objectControlLineWidth/2)+((int)Math.pow(-1, right)*((int)(objectControlLineWidth/2)*activeCalls)), startTime, (int)(objectControlLineWidth), endTime-startTime);
 		refreshDrawing();
 	}
 

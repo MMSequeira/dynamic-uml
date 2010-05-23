@@ -197,9 +197,8 @@ public class SequenceDiagramObject extends JLabel{
 	}
 	
 	private void drawObjectCalls(){
-		for(SequenceDiagramObjectCall call: callList){
+		for(SequenceDiagramObjectCall call: callList)
 			drawCall(call);
-		}
 		refreshDrawing();
 	}
 	
@@ -347,6 +346,16 @@ public class SequenceDiagramObject extends JLabel{
 		drawableSpace = new BufferedImage(labelWidth, newHeigth, BufferedImage.TYPE_INT_ARGB);
 		pen = (Graphics2D)drawableSpace.getGraphics();
 		drawWholeObject();
+	}
+	
+	public void prepareToReajustment(){
+		callList.clear();
+		controlLineList.clear();
+		drawWholeObject();
+	}
+	
+	public void refreshObject(){
+		refreshDrawing();
 	}
 	
 }

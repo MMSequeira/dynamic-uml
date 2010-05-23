@@ -8,17 +8,19 @@ public class SequenceDiagramCall {
 	private SequenceDiagramObject callee;
 	private int callTime;
 	private CallWay callWay;
+	private CallType callType;
 	private boolean returned;
 	
 	public SequenceDiagramCall(final int callID, final String methodName,
 			final SequenceDiagramObject caller, final SequenceDiagramObject callee, 
-			final int callTime,  final CallWay callWay) {
+			final int callTime,  final CallWay callWay, final CallType callType) {
 		this.callID = callID;
 		this.methodName = methodName;
 		this.caller = caller;
 		this.callee = callee;
 		this.callTime = callTime;
 		this.callWay = callWay;
+		this.callType = callType;
 		returned = false;
 	}
 
@@ -44,6 +46,10 @@ public class SequenceDiagramCall {
 	
 	public CallWay getCallWay(){
 		return callWay;
+	}
+	
+	public CallType getCallType(){
+		return callType;
 	}
 	
 	public boolean hasReturned(){

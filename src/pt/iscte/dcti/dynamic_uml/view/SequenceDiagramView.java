@@ -240,7 +240,7 @@ public class SequenceDiagramView {
 	 * @param objectID
 	 * @return SequenceDiagramObject
 	 */
-	private SequenceDiagramObject getSequenceDiagramObject(final int objectID){
+	public SequenceDiagramObject getSequenceDiagramObject(final int objectID){
 		for(SequenceDiagramObject object: sequenceDiagramObjectList)
 			if (object.getID() == objectID)
 				return object;

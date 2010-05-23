@@ -172,6 +172,22 @@ public class SequenceDiagramObject extends JLabel{
 	}
 	
 	/**
+	 * Setter for the object name field
+	 * @param new_name
+	 */
+	public void setObjectName(String new_name) {
+		objectName = new_name;
+	}
+	
+	/**
+	 * Setter for the object class field
+	 * @param new_class
+	 */
+	public void setObjectClass(String new_class) {
+		objectClass = new_class;
+	}
+	
+	/**
 	 * Sets a new size for the object's drawable space
 	 */
 	public void setNewDrawableSpaceSize(){

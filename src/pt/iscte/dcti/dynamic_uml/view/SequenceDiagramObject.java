@@ -2,6 +2,7 @@ package pt.iscte.dcti.dynamic_uml.view;
 
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.dnd.DropTarget;
@@ -16,6 +17,7 @@ import java.util.LinkedList;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.TransferHandler;
+import javax.swing.plaf.ToolTipUI;
 
 public class SequenceDiagramObject extends JLabel{
 
@@ -90,6 +92,8 @@ public class SequenceDiagramObject extends JLabel{
 		setIcon(new ImageIcon(drawableSpace));
 		pen = (Graphics2D)drawableSpace.getGraphics();
 		
+		setCursor(new Cursor(Cursor.HAND_CURSOR));
+		setToolTipText("<html>ID: " + objectID + "<br>Name: " + this.objectName + "<br>Class: " + this.objectClass + "</html>");
 		addMouseListener(mouseListener);
 		setTransferHandler(new TransferHandler("icon"));
 		setDropTarget(new DropTarget(this, new DropTargetListener() {

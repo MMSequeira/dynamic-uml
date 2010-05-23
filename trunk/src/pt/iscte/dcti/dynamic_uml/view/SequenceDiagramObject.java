@@ -152,7 +152,7 @@ public class SequenceDiagramObject extends JLabel{
 		return objectID;
 	}
 	
-	private void drawWholeObject(){
+	public void drawWholeObject(){
 		cleanObjectSpace();
 		drawObjectBox();
 		drawObjectLifeLine();

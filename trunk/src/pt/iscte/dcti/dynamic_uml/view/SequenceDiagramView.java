@@ -52,8 +52,6 @@ public class SequenceDiagramView {
 	
 	private MouseListener mouseListener = new DragMouseAdapter();
 	
-	private boolean reajustment = false;
-	
 	/**
 	 * Constructor for the user interface
 	 */
@@ -379,9 +377,6 @@ public class SequenceDiagramView {
 	}
 	
 	private void addaptDiagramToChanges(final int indexDrag, final int indexDrop) {
-		// TODO This method will re-ajust call and control lines after they've been moved
-		//JOptionPane.showMessageDialog(null, "The rearrangement of the call lines after moving object is not implemented.\nPlease put back the object in the original place.");
-		reajustment = true;
 		int minorIndex = indexDrop;
 		int majorIndex = indexDrag;
 		if(indexDrag < indexDrop){
@@ -396,13 +391,13 @@ public class SequenceDiagramView {
 		SequenceDiagramCall call;
 		SequenceDiagramCall newCall;
 		LinkedList<SequenceDiagramCall> newCallList = new LinkedList<SequenceDiagramCall>();
-		int minorID = ((SequenceDiagramObject)(principalPanel.getComponent(minorIndex))).getID();
+		/*int minorID = ((SequenceDiagramObject)(principalPanel.getComponent(minorIndex))).getID();
 		int majorID = ((SequenceDiagramObject)(principalPanel.getComponent(majorIndex))).getID();
 		int callerID;
-		int calleeID;
+		int calleeID;*/
 		for(int i = 0; i < sequenceDiagramCallList.size(); i++){
 			call = sequenceDiagramCallList.get(i);
-			if(call.getCaller() != null)
+			/*if(call.getCaller() != null)
 				callerID = call.getCaller().getID();
 			else
 				callerID = -1;
@@ -410,7 +405,7 @@ public class SequenceDiagramView {
 				calleeID = call.getCallee().getID();
 			else
 				calleeID = -1;
-			/*if(calleeID == minorID ||
+			if(calleeID == minorID ||
 					calleeID == majorID ||
 					callerID == minorID ||
 					callerID == majorID){
@@ -424,9 +419,9 @@ public class SequenceDiagramView {
 			applyCall(newCall);
 			newCallList.add(newCall);
 		}
-		for(int i = minorIndex; i <= majorIndex; i++){
+		for(int i = 0; i < sequenceDiagramObjectList.size(); i++){
 			object = ((SequenceDiagramObject)(principalPanel.getComponent(i)));
-			object.refreshObject();
+			object.drawWholeObject();
 		}
 		sequenceDiagramCallList = newCallList;
 	}
@@ -453,6 +448,7 @@ public class SequenceDiagramView {
 				calleeCallType = CallType.CallReceive;
 			}else if(type.equals(CallType.ReturnSend)){
 				calleeCallType = CallType.ReturnReceive;
+				callName = "return "+callName;
 			}else{
 				calleeCallType = CallType.NewReceive;
 			}

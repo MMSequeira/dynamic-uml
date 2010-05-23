@@ -52,6 +52,8 @@ public class SequenceDiagramView {
 	
 	private MouseListener mouseListener = new DragMouseAdapter();
 	
+	private boolean reajustment = false;
+	
 	/**
 	 * Constructor for the user interface
 	 */
@@ -91,7 +93,7 @@ public class SequenceDiagramView {
 		}
 		sequenceDiagramCallList.add(new SequenceDiagramCall(callID, "new", 
 				getSequenceDiagramObject(callerObjectID), newObject, initTime, 
-				CallWay.Right));
+				CallWay.Right, CallType.NewSend));
 		
 		passCallsIfNeeded(eventTimeController.getPreviousTime(),callerObjectID,objectID);
 		refreshObjectsLifeLines();
@@ -146,7 +148,7 @@ public class SequenceDiagramView {
 			way = CallWay.Left;
 		}
 		SequenceDiagramCall newCall = new SequenceDiagramCall(callID, methodName, 
-				caller, callee, callTime, way);
+				caller, callee, callTime, way, CallType.CallSend);
 		sequenceDiagramCallList.add(newCall);
 		if(callerID >= 0 && callerID <= sequenceDiagramObjectID)
 			caller.newCall(methodName, callTime, way, CallType.CallSend);
@@ -173,7 +175,7 @@ public class SequenceDiagramView {
 			else
 				callWay = CallWay.Self;
 			SequenceDiagramCall newCall = new SequenceDiagramCall(newCallID, methodName, 
-					newCaller, newCallee, callTime, callWay);
+					newCaller, newCallee, callTime, callWay, CallType.ReturnSend);
 			sequenceDiagramCallList.add(newCall);
 			int callerID;
 			if(newCaller != null){
@@ -369,13 +371,126 @@ public class SequenceDiagramView {
 			principalPanel.add(draggedObject, indexDrop);
 		else
 			JOptionPane.showMessageDialog(null, "Fatal Error: Drag and Drop");
-		addaptDiagramToChanges(indexDrag,indexDrop);
+		
+		if(indexDrag != indexDrop)
+			addaptDiagramToChanges(indexDrag,indexDrop);
+		
 		refreshContentPane();
 	}
 	
 	private void addaptDiagramToChanges(final int indexDrag, final int indexDrop) {
 		// TODO This method will re-ajust call and control lines after they've been moved
-		JOptionPane.showMessageDialog(null, "The rearrangement of the call lines after moving object is not implemented.\nPlease but back the object in the original place.");
+		//JOptionPane.showMessageDialog(null, "The rearrangement of the call lines after moving object is not implemented.\nPlease put back the object in the original place.");
+		reajustment = true;
+		int minorIndex = indexDrop;
+		int majorIndex = indexDrag;
+		if(indexDrag < indexDrop){
+			majorIndex = indexDrop;
+			minorIndex = indexDrag;
+		}
+		SequenceDiagramObject object;
+		for(int i = minorIndex; i <= majorIndex; i++){
+			object = ((SequenceDiagramObject)(principalPanel.getComponent(i)));
+			object.prepareToReajustment();
+		}
+		SequenceDiagramCall call;
+		SequenceDiagramCall newCall;
+		LinkedList<SequenceDiagramCall> newCallList = new LinkedList<SequenceDiagramCall>();
+		int minorID = ((SequenceDiagramObject)(principalPanel.getComponent(minorIndex))).getID();
+		int majorID = ((SequenceDiagramObject)(principalPanel.getComponent(majorIndex))).getID();
+		int callerID;
+		int calleeID;
+		for(int i = 0; i < sequenceDiagramCallList.size(); i++){
+			call = sequenceDiagramCallList.get(i);
+			if(call.getCaller() != null)
+				callerID = call.getCaller().getID();
+			else
+				callerID = -1;
+			if(call.getCallee() != null)
+				calleeID = call.getCallee().getID();
+			else
+				calleeID = -1;
+			/*if(calleeID == minorID ||
+					calleeID == majorID ||
+					callerID == minorID ||
+					callerID == majorID){
+				newCall = changeCall(call);
+				applyCall(newCall);
+				newCallList.add(newCall);
+			}else{
+				newCallList.add(call);
+			}*/
+			newCall = changeCall(call);
+			applyCall(newCall);
+			newCallList.add(newCall);
+		}
+		for(int i = minorIndex; i <= majorIndex; i++){
+			object = ((SequenceDiagramObject)(principalPanel.getComponent(i)));
+			object.refreshObject();
+		}
+		sequenceDiagramCallList = newCallList;
+	}
+
+	private void applyCall(final SequenceDiagramCall newCall) {
+		String callName = newCall.getMethodName();
+		SequenceDiagramObject caller = newCall.getCaller();
+		SequenceDiagramObject callee = newCall.getCallee();
+		int callTime = newCall.getCallTime();
+		CallWay way = newCall.getCallWay();
+		CallType type = newCall.getCallType();
+		int callerID;
+		int calleeID;
+		if(caller != null){
+			callerID = caller.getID();
+			caller.newCall(callName, callTime, way, type);
+		}else{
+			callerID = -1;
+		}
+		if(callee != null){
+			calleeID = callee.getID();
+			CallType calleeCallType;
+			if(type.equals(CallType.CallSend)){
+				calleeCallType = CallType.CallReceive;
+			}else if(type.equals(CallType.ReturnSend)){
+				calleeCallType = CallType.ReturnReceive;
+			}else{
+				calleeCallType = CallType.NewReceive;
+			}
+			callee.newCall(callName, callTime, way, calleeCallType);
+		}else{
+			calleeID = -1;
+		}
+		
+		passCallsIfNeeded(callTime, callerID, calleeID);
+	}
+
+	private SequenceDiagramCall changeCall(final SequenceDiagramCall call) {
+		int callID = call.getID();
+		String methodName = call.getMethodName();
+		SequenceDiagramObject caller = call.getCaller();
+		SequenceDiagramObject callee = call.getCallee();
+		int callTime = call.getCallTime();
+		CallWay callWay;
+		CallType callType = call.getCallType();
+		int callerIndex;
+		int calleeIndex;
+		if(caller != null)
+			callerIndex = getSequenceDiagramObjectIndex(caller.getID());
+		else
+			callerIndex = -1;
+		if(callee != null)
+			calleeIndex = getSequenceDiagramObjectIndex(callee.getID());
+		else
+			calleeIndex = -1;
+		
+		if(callerIndex < calleeIndex)
+			callWay = CallWay.Right;
+		else if(callerIndex == calleeIndex)
+			callWay = CallWay.Self;
+		else
+			callWay = CallWay.Left;
+		
+		return new SequenceDiagramCall(callID, methodName, caller, callee, callTime, callWay, callType);
 	}
 	
 }

@@ -59,7 +59,7 @@ public privileged aspect TracerAddon extends AbstractTracer {
 		
 		int id_creator = System.identityHashCode(thisJoinPoint.getThis());
 		int diagram_id_creator;
-		if(id_creator == 0)
+		if(id_creator == 0) //The hash code for the null reference is 0
 			diagram_id_creator = SYSTEM_OBJECT_NUMBER_ID;
 		else
 			diagram_id_creator = hash_map.get(id_creator);

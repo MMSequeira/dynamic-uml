@@ -478,7 +478,7 @@ public class SequenceDiagramView {
 		if(caller != null){
 			callerID = caller.getID();
 			String callNameCopy = callName;
-			if(type.equals(CallType.ReturnSend) || way.equals(CallWay.Self))
+			if(type.equals(CallType.ReturnSend) && way.equals(CallWay.Self))
 				callName = "return "+callName;
 			caller.newCall(callName, callTime, way, type);
 			callName = callNameCopy;

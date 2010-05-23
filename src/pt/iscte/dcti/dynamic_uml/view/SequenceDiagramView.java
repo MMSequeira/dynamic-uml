@@ -206,11 +206,11 @@ public class SequenceDiagramView {
 		principalPanel.setLayout(new GridLayout());
 		//Blank jlabels padding
 		JLabel padLabel;
-		BufferedImage padImage = new BufferedImage(objectPanelWidth,1000,BufferedImage.TYPE_INT_ARGB);
+		BufferedImage padImage = new BufferedImage(objectPanelWidth,SequenceDiagramObject.initObjectDrawableSpaceHeigth,BufferedImage.TYPE_INT_ARGB);
 		Graphics2D pen = (Graphics2D)padImage.getGraphics();
 		pen.setColor(Color.white);
 		pen.fillRect(0, 0, objectPanelWidth, eventTimeController.getSequenceDiagramObjectDrawableSpaceHeigth());
-		for (int i = 0; i < (int)(initWindowWidth/objectPanelWidth); i++){
+		for (int i = 0; i < (((int)(initWindowWidth/objectPanelWidth))+1); i++){
 			padLabel = new JLabel(new ImageIcon(padImage));
 			padLabel.setPreferredSize(new Dimension(objectPanelWidth, eventTimeController.getSequenceDiagramObjectDrawableSpaceHeigth()));
 			principalPanel.add(padLabel);

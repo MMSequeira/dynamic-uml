@@ -31,9 +31,9 @@ public privileged aspect TracerAddon extends AbstractTracer {
 	
 	private pointcut finalizeCall() : call(void *.finalize(..)) && !codeInsideMyProject();
     
-	//Pag 114
-	//Pag 131
-	//Pagina 191 (238) do Manning
+	//Page 114
+	//Page 131
+	//Page 191 (238) from Manning
 	public static interface HandledFinalize {
 		 public void finalize();
 	}
@@ -45,7 +45,7 @@ public privileged aspect TracerAddon extends AbstractTracer {
 	Object around() : mainCall() {
 		int id_this = System.identityHashCode(thisJoinPoint.getThis());//Main ID
 		System.out.println(id_this);
-		System.out.println("Apanhei um main!");
+		System.out.println("Caught a main!");
 		return new Object();
 	}
 	*/
@@ -67,7 +67,7 @@ public privileged aspect TracerAddon extends AbstractTracer {
 		
 		String object_class_name = object.getClass().getName();
 		Class class_type = object.getClass();
-		//String object_name = (class_type)object;
+		
 		if(!(object instanceof Enum<?>)) {
 			if(DISPLAY_CONSOLE_MESSAGES)
 				System.out.println("--Constructor Call-- "+object.toString());
@@ -130,7 +130,7 @@ public privileged aspect TracerAddon extends AbstractTracer {
 		else
 			diagram_id_this = hash_map.get(id_this);
 		//System.out.println(diagram_id_this);
-		int diagram_id_target;// = hash_map.get(id_target);
+		int diagram_id_target;
 		if(id_target == 0 || id_target == id_system_in || id_target == id_system_out || id_target == id_system_err)
 			diagram_id_target = -1;
 		else
@@ -138,6 +138,8 @@ public privileged aspect TracerAddon extends AbstractTracer {
 		//System.out.println(diagram_id_target);
 		
 		//System.out.println("Corrected Method - Hashmap<System.code, id> -> this: "+diagram_id_this+" , target: "+diagram_id_target);
+		
+		//Create Call in Sequence Diagram
 		int method_call = 0;
 		boolean id_is_not_from_system = (diagram_id_this != SYSTEM_OBJECT_NUMBER_ID || diagram_id_target != SYSTEM_OBJECT_NUMBER_ID);
 		if(id_is_not_from_system) {
@@ -152,6 +154,7 @@ public privileged aspect TracerAddon extends AbstractTracer {
 		}
 		proceed();
 		//System.out.println("Finished that method's proceed...");
+		//Create Return in Sequence Diagram
 		if(id_is_not_from_system)
 			sequence_diagram_view.createReturn(method_call);
 		
@@ -174,7 +177,7 @@ public privileged aspect TracerAddon extends AbstractTracer {
 		else
 			diagram_id_this = hash_map.get(id_this);
 		//System.out.println(diagram_id_this);
-		int diagram_id_target;// = hash_map.get(id_target);
+		int diagram_id_target;
 		if(id_target == 0 || id_target == id_system_in || id_target == id_system_out || id_target == id_system_err)
 			diagram_id_target = -1;
 		else
@@ -182,6 +185,8 @@ public privileged aspect TracerAddon extends AbstractTracer {
 		//System.out.println(diagram_id_target);
 		
 		//System.out.println("Corrected Function - Hashmap<System.code, id> -> this: "+diagram_id_this+" , target: "+diagram_id_target);
+		
+		//Create Call in Sequence Diagram
 		int function_call = 0;
 		boolean id_is_not_from_system = (diagram_id_this != SYSTEM_OBJECT_NUMBER_ID || diagram_id_target != SYSTEM_OBJECT_NUMBER_ID);
 		if(id_is_not_from_system)
@@ -191,11 +196,11 @@ public privileged aspect TracerAddon extends AbstractTracer {
 			System.out.println("The object: "+thisJoinPoint.getThis()+" with sequence id: "+hash_map.get(id_this)+" called function: "+thisJoinPoint.getSignature()+" from object: "+thisJoinPoint.getTarget()+" with sequence id: "+hash_map.get(id_target));
 		}
 		Object object = proceed();
+		//Create Return in Sequence Diagram
 		if(id_is_not_from_system)
 			sequence_diagram_view.createReturn(function_call);
 		//System.out.println("FUNCTION DEBUG POINT END");
 		return object;
-		
 	}
 	
 }

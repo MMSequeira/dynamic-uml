@@ -512,6 +512,7 @@ public class SequenceDiagramView {
 
 		SequenceDiagramView view = new SequenceDiagramView();
 		view.createSequenceDiagramObject("Objecto 0", "Classe 0", -1);
+		view.createReturn(view.createCall("selfFunction", 0, 0));
 		view.createSequenceDiagramObject("Objecto 1", "Classe 1", -1);
 		view.createSequenceDiagramObject("Objecto 2", "Classe 2", 1);
 		int callID0 = view.createCall("funcao0", -1, 1);

@@ -17,34 +17,35 @@ import java.util.LinkedList;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.TransferHandler;
-import javax.swing.plaf.ToolTipUI;
 
+/**
+ * This class implements a representation of a sequence diagram object
+ * @author Filipe Casal Ribeiro nº27035, José Monteiro nº11911, Luís Serrano nº11187
+ *
+ */
 public class SequenceDiagramObject extends JLabel{
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	
-	public static final int initObjectDrawableSpaceHeigth = 1000;
+	public static final int initObjectDrawableSpaceHeight = 1000;
 	public static final int northBorder = 20;
 	private static final float objectBoxWidthRatio = 0.5f;
-	private static final float objectBoxHeigthRatio = objectBoxWidthRatio/2;
-	private static final float objectCrossWidthRatio = objectBoxHeigthRatio/2;
-	private static final float objectCrossHeigthRatio = objectBoxHeigthRatio/2;
+	private static final float objectBoxHeightRatio = objectBoxWidthRatio/2;
+	private static final float objectCrossWidthRatio = objectBoxHeightRatio/2;
+	private static final float objectCrossHeightRatio = objectBoxHeightRatio/2;
 	private static final float callLinkCircleRatio = 0.015f;
 	private static final float objectControlLineWidthRatio = 0.1f;
 	
 	private static final float objectBoxWidth = objectBoxWidthRatio*SequenceDiagramView.objectPanelWidth;
-	public static final float objectBoxHeigth = objectBoxHeigthRatio*SequenceDiagramView.objectPanelWidth;
+	public static final float objectBoxHeight = objectBoxHeightRatio*SequenceDiagramView.objectPanelWidth;
 	private static final float objectCrossWidth = objectCrossWidthRatio*SequenceDiagramView.objectPanelWidth;
-	public static final float objectCrossHeigth = objectCrossHeigthRatio*SequenceDiagramView.objectPanelWidth;
+	public static final float objectCrossHeight = objectCrossHeightRatio*SequenceDiagramView.objectPanelWidth;
 	private static final float callLinkCircleRadius = callLinkCircleRatio*SequenceDiagramView.objectPanelWidth;
 	private static final float objectControlLineWidth = objectControlLineWidthRatio*SequenceDiagramView.objectPanelWidth;
 	
 	private int labelWidth;
-	private int initTime = 0;
-	private int destructTime = -1;
+	private int initTime;
+	private int destructionTime = -1;
 	private String objectName;
 	private String objectClass;
 	private int objectID;
@@ -55,22 +56,18 @@ public class SequenceDiagramObject extends JLabel{
 	private int activeCalls = 0;
 	
 	private Color backgroundColor = Color.white;
-	
 	private Graphics2D pen;
 	private BufferedImage drawableSpace;
 	
 	/**
 	 * Constructor for an object of the sequence diagram
-	 * 
-	 * @param labelWidth
 	 * @param initTime
 	 * @param objectName
 	 * @param objectClass
 	 * @param objectID
-	 * @param mouseListener 
-	 * @param dragAndDropController 
-	 * @param refreshingThread 
-	 * @param drawableSpace
+	 * @param mouseListener
+	 * @param dragAndDropController
+	 * @param eventTimeController
 	 */
 	public SequenceDiagramObject(final int initTime,
 			final String objectName, final String objectClass, final int objectID, 
@@ -127,15 +124,29 @@ public class SequenceDiagramObject extends JLabel{
 		drawWholeObject();
 	}
 	
+	/**
+	 * Refreshes the object life line
+	 */
 	public void refreshObjectLifeLine(){
 		drawObjectLifeLine();
 	}
 	
-	public void destruct(final int destructTime){
-		this.destructTime = destructTime;
-		drawObjectDestructCross();
+	/**
+	 * Simulates the destruction of the object
+	 * @param destructionTime
+	 */
+	public void destroy(final int destructionTime){
+		this.destructionTime = destructionTime;
+		drawObjectDestructionCross();
 	}
 	
+	/**
+	 * Creates a new representation of a call that can passes through the object
+	 * @param callName
+	 * @param time
+	 * @param way
+	 * @param type
+	 */
 	public void newCall(final String callName, final int time, final CallWay way, final CallType type){
 		SequenceDiagramObjectCall newCall = new SequenceDiagramObjectCall(callName, time, way, type);
 		callList.add(newCall);
@@ -152,10 +163,38 @@ public class SequenceDiagramObject extends JLabel{
 		drawObjectCalls();
 	}
 	
+	/**
+	 * Getter for the ID of the object
+	 * @return
+	 */
 	public int getID(){
 		return objectID;
 	}
 	
+	/**
+	 * Sets a new size for the object's drawable space
+	 */
+	public void setNewDrawableSpaceSize(){
+		int newHeigth = eventTimeController.getSequenceDiagramObjectDrawableSpaceHeigth();
+		setPreferredSize(new Dimension(labelWidth, newHeigth));
+		drawableSpace = new BufferedImage(labelWidth, newHeigth, BufferedImage.TYPE_INT_ARGB);
+		pen = (Graphics2D)drawableSpace.getGraphics();
+		drawWholeObject();
+	}
+
+	/**
+	 * Prepares the object for re-arrangement. This method is used for re-arranging
+	 * the object's calls after drag and drop actions
+	 */
+	public void prepareForRearrangement(){
+		callList.clear();
+		controlLineList.clear();
+		drawWholeObject();
+	}
+
+	/**
+	 * Draws the whole object
+	 */
 	public void drawWholeObject(){
 		cleanObjectSpace();
 		drawObjectBox();
@@ -163,68 +202,90 @@ public class SequenceDiagramObject extends JLabel{
 		drawObjectControlLines();
 		drawObjectCalls();
 		if (!isAlive())
-			drawObjectDestructCross();
+			drawObjectDestructionCross();
 	}
 
+	/**
+	 * Draws the object box
+	 */
 	private void drawObjectBox(){
 		pen.setColor(Color.black);
 		pen.drawRect((int)(labelWidth*(1-objectBoxWidthRatio))/2, 
 				initTime, 
-				(int)(objectBoxWidth), (int)(objectBoxHeigth));
+				(int)(objectBoxWidth), (int)(objectBoxHeight));
 		pen.setColor(Color.orange);
 		pen.fillRect((int)(labelWidth*(1-objectBoxWidthRatio))/2, 
 				initTime, 
-				(int)(objectBoxWidth), (int)(objectBoxHeigth));
+				(int)(objectBoxWidth), (int)(objectBoxHeight));
 		pen.setColor(Color.black);
 		pen.drawString(objectID + " - " + objectName, 
 				((int)(labelWidth*(1-objectBoxWidthRatio))/2) + 1, 
-				initTime + ((int)(objectBoxHeigth)/2));
+				initTime + ((int)(objectBoxHeight)/2));
 		refreshDrawing();
 	}
 	
+	/**
+	 * Draws the object life line
+	 */
 	private void drawObjectLifeLine(){
 		int lifeLineEndTime;
 		if(isAlive())
 			lifeLineEndTime = eventTimeController.getCurrentTime();
 		else
-			lifeLineEndTime = destructTime;
+			lifeLineEndTime = destructionTime;
 		pen.setColor(Color.black);
-		pen.drawLine(labelWidth/2, (int)(initTime+objectBoxHeigth), labelWidth/2, 
+		pen.drawLine(labelWidth/2, (int)(initTime+objectBoxHeight), labelWidth/2, 
 				lifeLineEndTime);
 		refreshDrawing();
 	}
 	
+	/**
+	 * Draws the object life lines
+	 */
 	private void drawObjectControlLines(){
 		for(SequenceDiagramObjectControlLine controlLine: controlLineList)
 			drawControlLine(controlLine);
 		refreshDrawing();
 	}
 	
+	/**
+	 * Draws the object calls
+	 */
 	private void drawObjectCalls(){
 		for(SequenceDiagramObjectCall call: callList)
 			drawCall(call);
 		refreshDrawing();
 	}
 	
+	/**
+	 * Draws the object drop selection
+	 */
 	private void drawObjectDropSelection(){
 		pen.setColor(Color.lightGray);
-		pen.fillRect(0, 1, (int)(objectBoxHeigth)/4, (int)(objectBoxHeigth)/4);
+		pen.fillRect(0, 1, (int)(objectBoxHeight)/4, (int)(objectBoxHeight)/4);
 		pen.drawLine(0, 1, 0, (int)(eventTimeController.getSequenceDiagramObjectDrawableSpaceHeigth()));
 		pen.drawLine(0, 1, (int)(objectBoxWidth), 1);
 		refreshDrawing();
 	}
 	 
-	private void drawObjectDestructCross(){
+	/**
+	 * Draws the object destruction cross
+	 */
+	private void drawObjectDestructionCross(){
 		pen.setColor(Color.red);
-		pen.drawLine(labelWidth/2 - (int)(objectCrossWidth), destructTime-(int)(objectCrossHeigth)/2, 
+		pen.drawLine(labelWidth/2 - (int)(objectCrossWidth), destructionTime-(int)(objectCrossHeight)/2, 
 				labelWidth/2 + ((int)(objectCrossWidth)), 
-				(destructTime) + ((int)(objectCrossHeigth)/2));
-		pen.drawLine(labelWidth/2 - (int)(objectCrossWidth), (destructTime) + 
-				((int)(objectCrossHeigth)/2), labelWidth/2 + ((int)(objectCrossWidth)), 
-				destructTime-(int)(objectCrossHeigth)/2);
+				(destructionTime) + ((int)(objectCrossHeight)/2));
+		pen.drawLine(labelWidth/2 - (int)(objectCrossWidth), (destructionTime) + 
+				((int)(objectCrossHeight)/2), labelWidth/2 + ((int)(objectCrossWidth)), 
+				destructionTime-(int)(objectCrossHeight)/2);
 		refreshDrawing();
 	}
 	
+	/**
+	 * Draws the given call
+	 * @param call
+	 */
 	private void drawCall(final SequenceDiagramObjectCall call){
 		int right = 0;
 		if(call.getWay().equals(CallWay.Right))
@@ -299,6 +360,10 @@ public class SequenceDiagramObject extends JLabel{
 		refreshDrawing();
 	}
 	
+	/**
+	 * Draws the given control line
+	 * @param controlLine
+	 */
 	private void drawControlLine(SequenceDiagramObjectControlLine controlLine){
 		int startTime = controlLine.getStartTime();
 		int endTime = controlLine.getEndTime();
@@ -315,21 +380,10 @@ public class SequenceDiagramObject extends JLabel{
 		refreshDrawing();
 	}
 
-	private void cleanObjectSpace(){
-		pen.setColor(backgroundColor);
-		pen.fillRect(0, 0, labelWidth, drawableSpace.getHeight());
-		refreshDrawing();
-	}
-	
-	private void cleanObjectDropSelection(){
-		drawWholeObject();
-		refreshDrawing();
-	}
-	
-	private boolean isAlive(){
-		return destructTime == -1;
-	}
-	
+	/**
+	 * Returns the last active control line for the object
+	 * @return lastActiveControlLine
+	 */
 	private SequenceDiagramObjectControlLine getLastActiveControlLine(){
 		//activeCalls = 0;
 		SequenceDiagramObjectControlLine lastActiveControlLine = null;
@@ -339,27 +393,37 @@ public class SequenceDiagramObject extends JLabel{
 		}
 		return lastActiveControlLine;
 	}
-	
-	private void refreshDrawing(){
-		setIcon(new ImageIcon(drawableSpace));
-	}
-	
-	public void setNewDrawableSpaceSize(){
-		int newHeigth = eventTimeController.getSequenceDiagramObjectDrawableSpaceHeigth();
-		setPreferredSize(new Dimension(labelWidth, newHeigth));
-		drawableSpace = new BufferedImage(labelWidth, newHeigth, BufferedImage.TYPE_INT_ARGB);
-		pen = (Graphics2D)drawableSpace.getGraphics();
-		drawWholeObject();
-	}
-	
-	public void prepareToReajustment(){
-		callList.clear();
-		controlLineList.clear();
-		drawWholeObject();
-	}
-	
-	public void refreshObject(){
+
+	/**
+	 * Cleans the object's drawable space
+	 */
+	private void cleanObjectSpace(){
+		pen.setColor(backgroundColor);
+		pen.fillRect(0, 0, labelWidth, drawableSpace.getHeight());
 		refreshDrawing();
 	}
 	
+	/**
+	 * Cleans the object's drop selection
+	 */
+	private void cleanObjectDropSelection(){
+		drawWholeObject();
+		refreshDrawing();
+	}
+	
+	/**
+	 * Returns true if the object hasn't been destroyed 
+	 * @return boolean
+	 */
+	private boolean isAlive(){
+		return destructionTime == -1;
+	}
+	
+	/**
+	 * Refreshes the object's drawable space
+	 */
+	private void refreshDrawing(){
+		setIcon(new ImageIcon(drawableSpace));
+	}
+
 }

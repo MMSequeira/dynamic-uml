@@ -379,50 +379,35 @@ public class SequenceDiagramView {
 	private void addaptDiagramToChanges(final int indexDrag, final int indexDrop) {
 		int minorIndex = indexDrop;
 		int majorIndex = indexDrag;
+		
 		if(indexDrag < indexDrop){
 			majorIndex = indexDrop;
 			minorIndex = indexDrag;
 		}
+		
 		SequenceDiagramObject object;
+		
 		for(int i = minorIndex; i <= majorIndex; i++){
 			object = ((SequenceDiagramObject)(principalPanel.getComponent(i)));
 			object.prepareToReajustment();
 		}
+		
 		SequenceDiagramCall call;
 		SequenceDiagramCall newCall;
 		LinkedList<SequenceDiagramCall> newCallList = new LinkedList<SequenceDiagramCall>();
-		/*int minorID = ((SequenceDiagramObject)(principalPanel.getComponent(minorIndex))).getID();
-		int majorID = ((SequenceDiagramObject)(principalPanel.getComponent(majorIndex))).getID();
-		int callerID;
-		int calleeID;*/
+		
 		for(int i = 0; i < sequenceDiagramCallList.size(); i++){
 			call = sequenceDiagramCallList.get(i);
-			/*if(call.getCaller() != null)
-				callerID = call.getCaller().getID();
-			else
-				callerID = -1;
-			if(call.getCallee() != null)
-				calleeID = call.getCallee().getID();
-			else
-				calleeID = -1;
-			if(calleeID == minorID ||
-					calleeID == majorID ||
-					callerID == minorID ||
-					callerID == majorID){
-				newCall = changeCall(call);
-				applyCall(newCall);
-				newCallList.add(newCall);
-			}else{
-				newCallList.add(call);
-			}*/
 			newCall = changeCall(call);
 			applyCall(newCall);
 			newCallList.add(newCall);
 		}
+		
 		for(int i = 0; i < sequenceDiagramObjectList.size(); i++){
 			object = ((SequenceDiagramObject)(principalPanel.getComponent(i)));
 			object.drawWholeObject();
 		}
+		
 		sequenceDiagramCallList = newCallList;
 	}
 
@@ -435,27 +420,28 @@ public class SequenceDiagramView {
 		CallType type = newCall.getCallType();
 		int callerID;
 		int calleeID;
+		
 		if(caller != null){
 			callerID = caller.getID();
 			caller.newCall(callName, callTime, way, type);
-		}else{
+		}else
 			callerID = -1;
-		}
+
 		if(callee != null){
 			calleeID = callee.getID();
 			CallType calleeCallType;
-			if(type.equals(CallType.CallSend)){
+			
+			if(type.equals(CallType.CallSend))
 				calleeCallType = CallType.CallReceive;
-			}else if(type.equals(CallType.ReturnSend)){
+			else if(type.equals(CallType.ReturnSend)){
 				calleeCallType = CallType.ReturnReceive;
 				callName = "return "+callName;
-			}else{
+			}else
 				calleeCallType = CallType.NewReceive;
-			}
+	
 			callee.newCall(callName, callTime, way, calleeCallType);
-		}else{
+		}else
 			calleeID = -1;
-		}
 		
 		passCallsIfNeeded(callTime, callerID, calleeID);
 	}

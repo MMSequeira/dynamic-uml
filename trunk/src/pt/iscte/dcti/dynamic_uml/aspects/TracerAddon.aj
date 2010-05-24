@@ -8,6 +8,7 @@ import pt.iscte.dcti.instrumentation.aspects.AbstractTracer;
 public privileged aspect TracerAddon extends AbstractTracer {
 	
 	private final boolean DISPLAY_CONSOLE_MESSAGES = true;
+	private final boolean DISPLAY_INTERNAL_DEBUG_MESSAGES = false;
 	private final int SYSTEM_OBJECT_NUMBER_ID = -1;
 	
 	private SequenceDiagramView sequence_diagram_view;
@@ -63,8 +64,8 @@ public privileged aspect TracerAddon extends AbstractTracer {
 			diagram_id_creator = SYSTEM_OBJECT_NUMBER_ID;
 		else
 			diagram_id_creator = hash_map.get(id_creator);
-		//System.out.println("id: "+id_object);
-		//System.out.println("diagram_id_creator: "+diagram_id_creator);
+		//printInternalDebugLine("id: "+id_object);
+		//printInternalDebugLine("diagram_id_creator: "+diagram_id_creator);
 		
 		String object_class_name = object.getClass().getName();
 		Class class_type = object.getClass();
@@ -121,9 +122,9 @@ public privileged aspect TracerAddon extends AbstractTracer {
 		//System IDs
 		int id_this = System.identityHashCode(thisJoinPoint.getThis());
 		int id_target = System.identityHashCode(thisJoinPoint.getTarget());
-		//System.out.println("Method - System IDs - id_this = "+id_this+" id_target = "+id_target);
-		//System.out.println("Method - Hashmap<System.code, id> , and the get returned-> this: "+hash_map.get(id_this)+" , target: "+hash_map.get(id_target));
-		//System.out.println("Hashmap: "+hash_map);
+		printInternalDebugLine("Method - System IDs - id_this = "+id_this+" id_target = "+id_target);
+		printInternalDebugLine("Method - Hashmap<System.code, id> , and the get returned-> this: "+hash_map.get(id_this)+" , target: "+hash_map.get(id_target));
+		printInternalDebugLine("Hashmap: "+hash_map);
 		//Special case, for calls within an object construction
 		//System.out.println("id_this = "+id_this);
 		//System.out.println("hash_map.get(id_this) = "+hash_map.get(id_this));
@@ -143,7 +144,7 @@ public privileged aspect TracerAddon extends AbstractTracer {
 			
 			String object_class_name = object.getClass().getName();
 			
-			//System.out.println("(Method) Creating sequence diagram object in special conditions, for: "+object.toString()+" from class: "+object_class_name+" diagram id: "+diagram_id_creator);
+			printInternalDebugLine("(Method) Creating sequence diagram object in special conditions, for: "+object.toString()+" from class: "+object_class_name+" diagram id: "+diagram_id_creator);
 			int id = sequence_diagram_view.createSequenceDiagramObject(object.toString(), object_class_name, diagram_id_creator);
 			hash_map.put(System.identityHashCode(thisJoinPoint.getThis()), id);
 		}
@@ -161,7 +162,7 @@ public privileged aspect TracerAddon extends AbstractTracer {
 			diagram_id_target = hash_map.get(id_target);
 		//System.out.println("diagram_id_target = "+diagram_id_target);
 		
-		//System.out.println("Corrected Method - Hashmap<System.code, id> -> this: "+diagram_id_this+" , target: "+diagram_id_target);
+		printInternalDebugLine("Corrected Method - Hashmap<System.code, id> -> this: "+diagram_id_this+" , target: "+diagram_id_target);
 		
 		//Create Call in Sequence Diagram
 		int method_call = 0;
@@ -169,10 +170,10 @@ public privileged aspect TracerAddon extends AbstractTracer {
 		boolean id_is_not_from_system = (diagram_id_target != SYSTEM_OBJECT_NUMBER_ID);
 		//boolean id_is_not_from_system = (diagram_id_this != SYSTEM_OBJECT_NUMBER_ID || diagram_id_target != SYSTEM_OBJECT_NUMBER_ID);
 		if(id_is_not_from_system) {
-			//System.out.println("----CREATING NEW METHOD CALL IN DIAGRAM----");
-			//System.out.println("I will call .createCall("+thisJoinPoint.getSignature().getName()+", "+diagram_id_this+", "+diagram_id_target+")");
+			printInternalDebugLine("----CREATING NEW METHOD CALL IN DIAGRAM----");
+			printInternalDebugLine("I will call .createCall("+thisJoinPoint.getSignature().getName()+", "+diagram_id_this+", "+diagram_id_target+")");
 			method_call = sequence_diagram_view.createCall(thisJoinPoint.getSignature().getName(), diagram_id_this, diagram_id_target);
-			//System.out.println("-FINISHED-");
+			printInternalDebugLine("-FINISHED METHOD CALL CREATION IN DIAGRAM-");
 		} 
 		if(DISPLAY_CONSOLE_MESSAGES) {
 			System.out.println("--METHOD CALL--");
@@ -192,9 +193,9 @@ public privileged aspect TracerAddon extends AbstractTracer {
 		//System IDs
 		int id_this = System.identityHashCode(thisJoinPoint.getThis());
 		int id_target = System.identityHashCode(thisJoinPoint.getTarget());
-		//System.out.println("Function - System IDs - id_this = "+id_this+" id_target = "+id_target);
-		//System.out.println("Function - Hashmap<System.code, id> , and the get returned-> this: "+hash_map.get(id_this)+" , target: "+hash_map.get(id_target));
-		//System.out.println("Hashmap: "+hash_map);
+		printInternalDebugLine("Function - System IDs - id_this = "+id_this+" id_target = "+id_target);
+		printInternalDebugLine("Function - Hashmap<System.code, id> , and the get returned-> this: "+hash_map.get(id_this)+" , target: "+hash_map.get(id_target));
+		printInternalDebugLine("Hashmap: "+hash_map);
 		
 		//If object is not a system object and is not in the hashmap... we need to add it earlier than it naturally would!
 		if(id_this != 0 && hash_map.get(id_this) == null)
@@ -211,7 +212,7 @@ public privileged aspect TracerAddon extends AbstractTracer {
 			
 			String object_class_name = object.getClass().getName();
 			
-			//System.out.println("(Function) Creating sequence diagram object in special conditions, for: "+object.toString()+" from class: "+object_class_name+" diagram id: "+diagram_id_creator);
+			printInternalDebugLine("(Function) Creating sequence diagram object in special conditions, for: "+object.toString()+" from class: "+object_class_name+" diagram id: "+diagram_id_creator);
 			int id = sequence_diagram_view.createSequenceDiagramObject(object.toString(), object_class_name, diagram_id_creator);
 			hash_map.put(System.identityHashCode(thisJoinPoint.getThis()), id);
 		}
@@ -230,7 +231,7 @@ public privileged aspect TracerAddon extends AbstractTracer {
 			diagram_id_target = hash_map.get(id_target);
 		//System.out.println(diagram_id_target);
 		
-		//System.out.println("Corrected Function - Hashmap<System.code, id> -> this: "+diagram_id_this+" , target: "+diagram_id_target);
+		printInternalDebugLine("Corrected Function - Hashmap<System.code, id> -> this: "+diagram_id_this+" , target: "+diagram_id_target);
 		
 		//Create Call in Sequence Diagram
 		int function_call = 0;
@@ -238,10 +239,10 @@ public privileged aspect TracerAddon extends AbstractTracer {
 		boolean id_is_not_from_system = (diagram_id_target != SYSTEM_OBJECT_NUMBER_ID);
 		//boolean id_is_not_from_system = (diagram_id_this != SYSTEM_OBJECT_NUMBER_ID || diagram_id_target != SYSTEM_OBJECT_NUMBER_ID);
 		if(id_is_not_from_system) {
-			//System.out.println("----CREATING NEW FUNCTION CALL IN DIAGRAM----");
-			//System.out.println("I will call .createCall("+thisJoinPoint.getSignature().getName()+", "+diagram_id_this+", "+diagram_id_target+")");
+			printInternalDebugLine("----CREATING NEW FUNCTION CALL IN DIAGRAM----");
+			printInternalDebugLine("I will call .createCall("+thisJoinPoint.getSignature().getName()+", "+diagram_id_this+", "+diagram_id_target+")");
 			function_call = sequence_diagram_view.createCall(thisJoinPoint.getSignature().getName(), diagram_id_this, diagram_id_target);	
-			//System.out.println("-FINISHED-");
+			printInternalDebugLine("-FINISHED FUNCTION CALL CREATION IN DIAGRAM-");
 		}
 		if(DISPLAY_CONSOLE_MESSAGES) {
 			System.out.println("--FUNCTION CALL--");
@@ -253,6 +254,16 @@ public privileged aspect TracerAddon extends AbstractTracer {
 			sequence_diagram_view.createReturn(function_call);
 		//System.out.println("FUNCTION DEBUG POINT END");
 		return object;
+	}
+	
+	/**
+	 * Method that prints a message related with the internal debug of Dynamic UML.
+	 * It exists for the sole purpose of easing the Debugging of Dynamic UML during developpment.
+	 * @param message
+	 */
+	private void printInternalDebugLine(String message) {
+		if(DISPLAY_INTERNAL_DEBUG_MESSAGES)
+			System.out.println(message);
 	}
 	
 }

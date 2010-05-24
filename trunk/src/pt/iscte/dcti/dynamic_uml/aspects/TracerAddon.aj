@@ -118,6 +118,7 @@ public privileged aspect TracerAddon extends AbstractTracer {
 	
 	void around() : methodCalls() { //&& !within(java.lang.*) { //&& !execution(* *..System..*(..)) { //&& !cflow(execution(* *..System..*(..))) { //!withincode(* *..System..*(..)) {
 		//System.out.println("METHOD DEBUG POINT");
+		printInternalDebugLine("### Method Call -> Signature: "+thisJoinPoint.getSignature()+" This: "+thisJoinPoint.getThis()+" ID_This: "+System.identityHashCode(thisJoinPoint.getThis())+" - Target: "+thisJoinPoint.getTarget()+" ID_Target: "+System.identityHashCode(thisJoinPoint.getTarget()));
 		
 		//System IDs
 		int id_this = System.identityHashCode(thisJoinPoint.getThis());
@@ -178,17 +179,20 @@ public privileged aspect TracerAddon extends AbstractTracer {
 		if(DISPLAY_CONSOLE_MESSAGES) {
 			System.out.println("--METHOD CALL--");
 			System.out.println("The object: "+thisJoinPoint.getThis()+" with sequence id: "+hash_map.get(id_this)+" called method: "+thisJoinPoint.getSignature()+" from object: "+thisJoinPoint.getTarget()+" with sequence id: "+hash_map.get(id_target));
+			System.out.println("-----------------");
 		}
 		proceed();
 		//Create Return in Sequence Diagram
 		if(id_is_not_from_system)
 			sequence_diagram_view.createReturn(method_call);
 		
+		printInternalDebugLine("### Method Call Finished ###");
 		//System.out.println("METHOD DEBUG POINT END");
 	}
 	
 	Object around() : functionCalls() {
 		//System.out.println("FUNCTION DEBUG POINT");
+		printInternalDebugLine("### Function Call -> Signature: "+thisJoinPoint.getSignature()+" This: "+thisJoinPoint.getThis()+" ID_This: "+System.identityHashCode(thisJoinPoint.getThis())+" - Target: "+thisJoinPoint.getTarget()+" ID_Target: "+System.identityHashCode(thisJoinPoint.getTarget()));
 		
 		//System IDs
 		int id_this = System.identityHashCode(thisJoinPoint.getThis());
@@ -247,11 +251,13 @@ public privileged aspect TracerAddon extends AbstractTracer {
 		if(DISPLAY_CONSOLE_MESSAGES) {
 			System.out.println("--FUNCTION CALL--");
 			System.out.println("The object: "+thisJoinPoint.getThis()+" with sequence id: "+hash_map.get(id_this)+" called function: "+thisJoinPoint.getSignature()+" from object: "+thisJoinPoint.getTarget()+" with sequence id: "+hash_map.get(id_target));
+			System.out.println("-----------------");
 		}
 		Object object = proceed();
 		//Create Return in Sequence Diagram
 		if(id_is_not_from_system)
 			sequence_diagram_view.createReturn(function_call);
+		printInternalDebugLine("### Function Call Finished ###");
 		//System.out.println("FUNCTION DEBUG POINT END");
 		return object;
 	}

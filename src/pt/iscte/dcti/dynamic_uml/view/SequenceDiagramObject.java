@@ -177,6 +177,7 @@ public class SequenceDiagramObject extends JLabel{
 	 */
 	public void setObjectName(String new_name) {
 		objectName = new_name;
+		drawObjectBox();
 	}
 	
 	/**
@@ -185,6 +186,7 @@ public class SequenceDiagramObject extends JLabel{
 	 */
 	public void setObjectClass(String new_class) {
 		objectClass = new_class;
+		drawObjectBox();
 	}
 	
 	/**

@@ -29,6 +29,17 @@ public class Client {
 		return personal_seller.getName();
 	}
 	
+	public void changePersonalSeller(PersonalSeller new_seller) {
+		personal_seller = new_seller;
+		think();
+		askAttention();
+	}
+	
+	public void writeComplaintLetter() {
+		ComplaintLetter letter = new ComplaintLetter("A Complaint", "There was a mistake in the bill.");
+		letter.send();
+	}
+	
 	public static void main(String[] args) {
 
 	}

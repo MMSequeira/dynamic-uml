@@ -15,6 +15,10 @@ public class Main {
 		client_bob.askQuestion("Tell me the price, please.");
 		
 		String seller_name = client_bob.askName();
+		
+		PersonalSeller seller_tina = new PersonalSeller("Tina");
+		client_bob.changePersonalSeller(seller_tina);
+		client_bob.writeComplaintLetter();
 	}
 
 }

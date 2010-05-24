@@ -20,7 +20,7 @@ public privileged aspect TracerAddon extends AbstractTracer {
 	
 	public TracerAddon() {
 		sequence_diagram_view = new SequenceDiagramView();
-		hash_map = new HashMap();
+		hash_map = new HashMap<Integer, Integer>();
 	}
 	
 	//POINTCUTs
@@ -56,19 +56,19 @@ public privileged aspect TracerAddon extends AbstractTracer {
 	Object around() : constructorCall() {
 		// TODO How to avoid this being applied when there is a this?
 		Object object = proceed();
-		int id_object = System.identityHashCode(object);
+		//int id_creator = System.identityHashCode(object); //Different from thisJoinPoint.getThis()...
 		
-		int id_creator = System.identityHashCode(thisJoinPoint.getThis());
+		int id_object = System.identityHashCode(thisJoinPoint.getThis());
 		int diagram_id_creator;
-		if(id_creator == 0) //The hash code for the null reference is 0
+		if(id_object == 0) //The hash code for the null reference is 0
 			diagram_id_creator = SYSTEM_OBJECT_NUMBER_ID;
 		else
-			diagram_id_creator = hash_map.get(id_creator);
+			diagram_id_creator = hash_map.get(id_object);
 		//printInternalDebugLine("id: "+id_object);
 		//printInternalDebugLine("diagram_id_creator: "+diagram_id_creator);
 		
 		String object_class_name = object.getClass().getName();
-		Class class_type = object.getClass();
+		//Class class_type = object.getClass();
 		
 		if(!(object instanceof Enum<?>)) {
 			if(DISPLAY_CONSOLE_MESSAGES)
@@ -90,7 +90,7 @@ public privileged aspect TracerAddon extends AbstractTracer {
 		
 		//System.out.println("A Constructor of object "+object+" was executed, and his id is "+id);
 		if(!hash_map.containsKey(id)) {
-			//System.out.println("Last mentioned id was added to the hashmap");
+			//System.out.println("Last mentioned id was added to the hashmap because it wasn't there");
 			//sequence_diagram_view.createSequenceDiagramObject(object.toString(), object_class_name, SYSTEM_OBJECT_NUMBER_ID);
 			hash_map.put(System.identityHashCode(thisJoinPoint.getThis()), SYSTEM_OBJECT_NUMBER_ID);
 		}

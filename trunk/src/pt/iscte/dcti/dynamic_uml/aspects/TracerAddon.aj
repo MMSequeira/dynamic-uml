@@ -165,7 +165,9 @@ public privileged aspect TracerAddon extends AbstractTracer {
 		
 		//Create Call in Sequence Diagram
 		int method_call = 0;
-		boolean id_is_not_from_system = (diagram_id_this != SYSTEM_OBJECT_NUMBER_ID || diagram_id_target != SYSTEM_OBJECT_NUMBER_ID);
+		//If the call does not target the system, then it is because it is a normal call, or a call from the system to the program.
+		boolean id_is_not_from_system = (diagram_id_target != SYSTEM_OBJECT_NUMBER_ID);
+		//boolean id_is_not_from_system = (diagram_id_this != SYSTEM_OBJECT_NUMBER_ID || diagram_id_target != SYSTEM_OBJECT_NUMBER_ID);
 		if(id_is_not_from_system) {
 			//System.out.println("----CREATING NEW METHOD CALL IN DIAGRAM----");
 			//System.out.println("I will call .createCall("+thisJoinPoint.getSignature().getName()+", "+diagram_id_this+", "+diagram_id_target+")");
@@ -232,7 +234,9 @@ public privileged aspect TracerAddon extends AbstractTracer {
 		
 		//Create Call in Sequence Diagram
 		int function_call = 0;
-		boolean id_is_not_from_system = (diagram_id_this != SYSTEM_OBJECT_NUMBER_ID || diagram_id_target != SYSTEM_OBJECT_NUMBER_ID);
+		//If the call does not target the system, then it is because it is a normal call, or a call from the system to the program.
+		boolean id_is_not_from_system = (diagram_id_target != SYSTEM_OBJECT_NUMBER_ID);
+		//boolean id_is_not_from_system = (diagram_id_this != SYSTEM_OBJECT_NUMBER_ID || diagram_id_target != SYSTEM_OBJECT_NUMBER_ID);
 		if(id_is_not_from_system) {
 			//System.out.println("----CREATING NEW FUNCTION CALL IN DIAGRAM----");
 			//System.out.println("I will call .createCall("+thisJoinPoint.getSignature().getName()+", "+diagram_id_this+", "+diagram_id_target+")");

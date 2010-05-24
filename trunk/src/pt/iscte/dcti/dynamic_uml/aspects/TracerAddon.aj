@@ -1,6 +1,8 @@
 package pt.iscte.dcti.dynamic_uml.aspects;
 
 import java.util.HashMap;
+
+import pt.iscte.dcti.dynamic_uml.view.SequenceDiagramObject;
 import pt.iscte.dcti.dynamic_uml.view.SequenceDiagramView;
 import pt.iscte.dcti.instrumentation.aspects.AbstractTracer;
 
@@ -51,6 +53,7 @@ public privileged aspect TracerAddon extends AbstractTracer {
 	*/
 	
 	//--Catch Constructor Calls--
+	/*
 	Object around() : constructorCall() {
 		// TODO How to avoid this being applied when there is a this?
 		// TODO If the object calls methods within himself, upon construction, how will we deal with this in the diagrams, if we haven't got a System.identityHashCode for the object yet, before it's construction is complete?
@@ -77,7 +80,71 @@ public privileged aspect TracerAddon extends AbstractTracer {
 		
 		return object;
 	}
+	*/
 	
+	Object around() : constructorCall() {
+		Object object = thisJoinPoint.getThis();
+		int id_creator = System.identityHashCode(thisJoinPoint.getThis());
+		int diagram_id_creator;
+		if(id_creator == 0) //The hash code for the null reference is 0
+			diagram_id_creator = SYSTEM_OBJECT_NUMBER_ID;
+		else
+			diagram_id_creator = hash_map.get(id_creator);
+		
+		if(!(object instanceof Enum<?>)) {
+			int id = sequence_diagram_view.createSequenceDiagramObject("-Name-", "-Class-", diagram_id_creator);
+			hash_map.put(System.identityHashCode(object), id);
+		}
+		System.out.println("before proceed");
+		object = proceed();
+		System.out.println("after proceed");
+		String object_class_name = object.getClass().getName();
+		//Class class_type = object.getClass();
+		
+		if(!(object instanceof Enum<?>)) {
+			if(DISPLAY_CONSOLE_MESSAGES)
+				System.out.println("--Constructor Call-- "+object.toString());
+			
+			int id = hash_map.get(id_creator);
+			SequenceDiagramObject sequence_diagram_object = sequence_diagram_view.getSequenceDiagramObject(hash_map.get(id));
+			
+			sequence_diagram_object.setObjectName(object.toString());
+			sequence_diagram_object.setObjectClass(object_class_name);
+			//int id = sequence_diagram_view.createSequenceDiagramObject(object.toString(), object_class_name, diagram_id_creator);
+			//hash_map.put(System.identityHashCode(object), id);
+		}
+		System.out.println("Going to return");
+		return object;
+	}
+	
+	
+	/*
+	before() : constructorCall() {
+		Object object = thisJoinPoint.getThis();
+		int id_creator = System.identityHashCode(thisJoinPoint.getThis());
+		int diagram_id_creator;
+		if(id_creator == 0) //The hash code for the null reference is 0
+			diagram_id_creator = SYSTEM_OBJECT_NUMBER_ID;
+		else
+			diagram_id_creator = hash_map.get(id_creator);
+		
+		if(!(object instanceof Enum<?>)) {
+			int id = sequence_diagram_view.createSequenceDiagramObject("-Name-", "-Class-", diagram_id_creator);
+			hash_map.put(System.identityHashCode(object), id);
+		}
+	}
+	
+	after() : constructorCall() {
+		Object object = thisJoinPoint.getThis();
+		int id = System.identityHashCode(object);
+		SequenceDiagramObject sequence_diagram_object = sequence_diagram_view.getSequenceDiagramObject(hash_map.get(id));
+		
+		String object_class_name = object.getClass().getName();
+		
+		sequence_diagram_object.setObjectName(object.toString());
+		sequence_diagram_object.setObjectClass(object_class_name);
+	}
+	*/
 	
 	after() : constructorExecution() {
 		Object object = thisJoinPoint.getThis();
@@ -152,8 +219,9 @@ public privileged aspect TracerAddon extends AbstractTracer {
 			System.out.println("--METHOD CALL--");
 			System.out.println("The object: "+thisJoinPoint.getThis()+" with sequence id: "+hash_map.get(id_this)+" called method: "+thisJoinPoint.getSignature()+" from object: "+thisJoinPoint.getTarget()+" with sequence id: "+hash_map.get(id_target));
 		}
+		System.out.println("Before method's proceed...");
 		proceed();
-		//System.out.println("Finished that method's proceed...");
+		System.out.println("Finished that method's proceed...");
 		//Create Return in Sequence Diagram
 		if(id_is_not_from_system)
 			sequence_diagram_view.createReturn(method_call);

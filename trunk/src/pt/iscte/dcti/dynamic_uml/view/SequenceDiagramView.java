@@ -34,7 +34,7 @@ public class SequenceDiagramView {
 
 	private int initWindowWidth = 1024;
 	private int initWindowHeight = 700;
-	public static final int objectPanelWidth = 300;
+	public static final int objectPanelWidth = 250;
 
 	private JFrame principalFrame = new JFrame();
 	private JPanel principalPanel = new JPanel();

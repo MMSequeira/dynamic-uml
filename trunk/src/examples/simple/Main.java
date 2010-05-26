@@ -19,6 +19,13 @@ public class Main {
 		PersonalSeller seller_tina = new PersonalSeller("Tina");
 		client_bob.changePersonalSeller(seller_tina);
 		client_bob.writeComplaintLetter();
+		client_bob = null;
+		System.gc();
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

@@ -5,6 +5,11 @@ import java.util.HashMap;
 import pt.iscte.dcti.dynamic_uml.view.SequenceDiagramView;
 import pt.iscte.dcti.instrumentation.aspects.AbstractTracer;
 
+/**
+ * Aspect for the Dynamic UML Project
+ * @author Filipe Casal Ribeiro nº27035, José Monteiro nº11911, Luís Miguel Serrano nº11187
+ *
+ */
 public privileged aspect TracerAddon extends AbstractTracer {
 	
 	private final boolean DISPLAY_CONSOLE_MESSAGES = true;

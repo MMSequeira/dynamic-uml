@@ -1,7 +1,7 @@
 package examples.simple;
 
 public class Main {
-//&&&
+//
 	/**
 	 * @param args
 	 */

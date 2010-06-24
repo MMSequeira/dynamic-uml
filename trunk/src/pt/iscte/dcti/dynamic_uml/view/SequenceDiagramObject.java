@@ -1,6 +1,7 @@
 package pt.iscte.dcti.dynamic_uml.view;
 
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -26,7 +27,7 @@ import javax.swing.TransferHandler;
 public class SequenceDiagramObject extends JLabel{
 
 	private static final long serialVersionUID = 1L;
-	
+
 	public static final int initObjectDrawableSpaceHeight = 1000;
 	public static final int northBorder = 20;
 	private static final float objectBoxWidthRatio = 0.5f;
@@ -35,14 +36,14 @@ public class SequenceDiagramObject extends JLabel{
 	private static final float objectCrossHeightRatio = objectBoxHeightRatio/2;
 	private static final float callLinkCircleRatio = 0.015f;
 	private static final float objectControlLineWidthRatio = 0.1f;
-	
+
 	private static final float objectBoxWidth = objectBoxWidthRatio*SequenceDiagramView.objectPanelWidth;
 	public static final float objectBoxHeight = objectBoxHeightRatio*SequenceDiagramView.objectPanelWidth;
 	private static final float objectCrossWidth = objectCrossWidthRatio*SequenceDiagramView.objectPanelWidth;
 	public static final float objectCrossHeight = objectCrossHeightRatio*SequenceDiagramView.objectPanelWidth;
 	private static final float callLinkCircleRadius = callLinkCircleRatio*SequenceDiagramView.objectPanelWidth;
 	private static final float objectControlLineWidth = objectControlLineWidthRatio*SequenceDiagramView.objectPanelWidth;
-	
+
 	private int labelWidth;
 	private int initTime;
 	private int destructionTime = -1;
@@ -54,11 +55,11 @@ public class SequenceDiagramObject extends JLabel{
 	private LinkedList<SequenceDiagramObjectCall> callList;
 	private LinkedList<SequenceDiagramObjectControlLine> controlLineList;
 	private int activeCalls = 0;
-	
+
 	private Color backgroundColor = Color.white;
 	private Graphics2D pen;
 	private BufferedImage drawableSpace;
-	
+
 	/**
 	 * Constructor for an object of the sequence diagram
 	 * @param initTime
@@ -82,39 +83,39 @@ public class SequenceDiagramObject extends JLabel{
 		this.eventTimeController = eventTimeController;
 		callList = new LinkedList<SequenceDiagramObjectCall>();
 		controlLineList = new LinkedList<SequenceDiagramObjectControlLine>();
-		callList.add(new SequenceDiagramObjectCall("new", initTime, CallWay.Right, CallType.NewReceive));
-		
+		callList.add(new SequenceDiagramObjectCall("new", initTime, CallWay.Right, CallType.NewReceive, activeCalls));
+
 		setPreferredSize(new Dimension(labelWidth, eventTimeController.getSequenceDiagramObjectDrawableSpaceHeigth()));
 		drawableSpace = new BufferedImage(labelWidth, eventTimeController.getSequenceDiagramObjectDrawableSpaceHeigth(), BufferedImage.TYPE_INT_ARGB);
 		setIcon(new ImageIcon(drawableSpace));
 		pen = (Graphics2D)drawableSpace.getGraphics();
-		
+
 		setCursor(new Cursor(Cursor.HAND_CURSOR));
 		setToolTipText("<html>ID: " + objectID + "<br>Name: " + this.objectName + "<br>Class: " + this.objectClass + "</html>");
 		addMouseListener(mouseListener);
 		setTransferHandler(new TransferHandler("icon"));
 		setDropTarget(new DropTarget(this, new DropTargetListener() {
-			
+
 			@Override
 			public void dropActionChanged(DropTargetDragEvent event) {
 			}
-			
+
 			@Override
 			public void drop(DropTargetDropEvent event) {
 				cleanObjectDropSelection();
 				dragAndDropController.setDropItem(objectID);
 				dragAndDropController.reset();
 			}
-			
+
 			@Override
 			public void dragOver(DropTargetDragEvent event) {
 			}
-			
+
 			@Override
 			public void dragExit(DropTargetEvent event) {
 				cleanObjectDropSelection();
 			}
-			
+
 			@Override
 			public void dragEnter(DropTargetDragEvent event) {
 				drawObjectDropSelection();
@@ -123,14 +124,14 @@ public class SequenceDiagramObject extends JLabel{
 		}));
 		drawWholeObject();
 	}
-	
+
 	/**
 	 * Refreshes the object life line
 	 */
 	public void refreshObjectLifeLine(){
 		drawObjectLifeLine();
 	}
-	
+
 	/**
 	 * Simulates the destruction of the object
 	 * @param destructionTime
@@ -139,7 +140,7 @@ public class SequenceDiagramObject extends JLabel{
 		this.destructionTime = destructionTime;
 		drawObjectDestructionCross();
 	}
-	
+
 	/**
 	 * Creates a new representation of a call that can passes through the object
 	 * @param callName
@@ -148,7 +149,7 @@ public class SequenceDiagramObject extends JLabel{
 	 * @param type
 	 */
 	public void newCall(final String callName, final int time, final CallWay way, final CallType type){
-		SequenceDiagramObjectCall newCall = new SequenceDiagramObjectCall(callName, time, way, type);
+		SequenceDiagramObjectCall newCall = new SequenceDiagramObjectCall(callName, time, way, type, activeCalls);
 		callList.add(newCall);
 		if(type.equals(CallType.CallReceive)){
 			SequenceDiagramObjectControlLine newControlLine = new SequenceDiagramObjectControlLine(time,activeCalls++,way);
@@ -162,7 +163,7 @@ public class SequenceDiagramObject extends JLabel{
 		drawObjectControlLines();
 		drawObjectCalls();
 	}
-	
+
 	/**
 	 * Getter for the ID of the object
 	 * @return
@@ -170,7 +171,7 @@ public class SequenceDiagramObject extends JLabel{
 	public int getID(){
 		return objectID;
 	}
-	
+
 	/**
 	 * Setter for the object name field
 	 * @param new_name
@@ -179,7 +180,7 @@ public class SequenceDiagramObject extends JLabel{
 		objectName = new_name;
 		drawObjectBox();
 	}
-	
+
 	/**
 	 * Setter for the object class field
 	 * @param new_class
@@ -188,7 +189,7 @@ public class SequenceDiagramObject extends JLabel{
 		objectClass = new_class;
 		drawObjectBox();
 	}
-	
+
 	/**
 	 * Sets a new size for the object's drawable space
 	 */
@@ -241,7 +242,7 @@ public class SequenceDiagramObject extends JLabel{
 				initTime + ((int)(objectBoxHeight)/2));
 		refreshDrawing();
 	}
-	
+
 	/**
 	 * Draws the object life line
 	 */
@@ -256,7 +257,7 @@ public class SequenceDiagramObject extends JLabel{
 				lifeLineEndTime);
 		refreshDrawing();
 	}
-	
+
 	/**
 	 * Draws the object life lines
 	 */
@@ -265,7 +266,7 @@ public class SequenceDiagramObject extends JLabel{
 			drawControlLine(controlLine);
 		refreshDrawing();
 	}
-	
+
 	/**
 	 * Draws the object calls
 	 */
@@ -274,7 +275,7 @@ public class SequenceDiagramObject extends JLabel{
 			drawCall(call);
 		refreshDrawing();
 	}
-	
+
 	/**
 	 * Draws the object drop selection
 	 */
@@ -285,7 +286,7 @@ public class SequenceDiagramObject extends JLabel{
 		pen.drawLine(0, 1, (int)(objectBoxWidth), 1);
 		refreshDrawing();
 	}
-	 
+
 	/**
 	 * Draws the object destruction cross
 	 */
@@ -299,7 +300,7 @@ public class SequenceDiagramObject extends JLabel{
 				destructionTime-(int)(objectCrossHeight)/2);
 		refreshDrawing();
 	}
-	
+
 	/**
 	 * Draws the given call
 	 * @param call
@@ -309,38 +310,39 @@ public class SequenceDiagramObject extends JLabel{
 		if(call.getWay().equals(CallWay.Right))
 			right = 1;
 		int time = call.getTime();
+		int activeCalls = call.getNumberOfActiveCalls();
 		String name = call.getName();
+		float dashed[] = {5.0f,5.0f,5.0f};
+		BasicStroke normalStroke = new BasicStroke();
+		BasicStroke dashedStroke = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 10.0f, dashed, 10.0f);
 		pen.setColor(Color.black);
 		if(call.getType().equals(CallType.NewSend) || 
 				call.getType().equals(CallType.CallSend) || 
 				call.getType().equals(CallType.ReturnSend)){
-			pen.drawOval(labelWidth/2-(int)callLinkCircleRadius, 
-					time-(int)callLinkCircleRadius, (int)callLinkCircleRadius*2, 
-					(int)callLinkCircleRadius*2);
-			pen.fillOval(labelWidth/2-(int)callLinkCircleRadius, 
-					time-(int)callLinkCircleRadius, (int)callLinkCircleRadius*2, 
-					(int)callLinkCircleRadius*2);
+			if (call.getType().equals(CallType.ReturnSend)){
+				pen.setStroke(dashedStroke);
+			}
 			if(!call.getWay().equals(CallWay.Self)){
-				pen.drawLine(labelWidth/2, time, 
+				pen.drawLine(labelWidth/2-((int)Math.pow(-1, right)*((int)(objectControlLineWidth/2)*activeCalls)), time, 
 						labelWidth*right, time);
 			}else{
-				pen.drawLine(labelWidth/2, time, 
+				pen.drawLine((int)((labelWidth/2) + (activeCalls)*((int)objectControlLineWidth/2)), time, 
 						((labelWidth/4)*3), time);
 				pen.drawString(name+"( )", (labelWidth/2)+(int)(objectControlLineWidth/2), 
 						time-(int)callLinkCircleRadius);
 			}
-			
+
 		}else if(call.getType().equals(CallType.NewReceive)){
 			pen.drawLine(labelWidth*(1-right), time, 
 					(int)(((labelWidth*(1-objectBoxWidthRatio))/2)+
 							((1-right)*objectBoxWidth)), time);
 			pen.drawLine((int)(((labelWidth*(1-objectBoxWidthRatio))/2)+
-							((1-right)*objectBoxWidth)), time, 
-							(int)(((int)(((labelWidth*(1-objectBoxWidthRatio))/2)+
-									((1-right)*objectBoxWidth)))+
-									(Math.pow(-1, right)*
-											((int)callLinkCircleRadius*2))), 
-											time-((int)callLinkCircleRadius));
+					((1-right)*objectBoxWidth)), time, 
+					(int)(((int)(((labelWidth*(1-objectBoxWidthRatio))/2)+
+							((1-right)*objectBoxWidth)))+
+							(Math.pow(-1, right)*
+									((int)callLinkCircleRadius*2))), 
+									time-((int)callLinkCircleRadius));
 			pen.drawLine((int)(((labelWidth*(1-objectBoxWidthRatio))/2)+
 					((1-right)*objectBoxWidth)), time, 
 					(int)(((int)(((labelWidth*(1-objectBoxWidthRatio))/2)+
@@ -349,35 +351,43 @@ public class SequenceDiagramObject extends JLabel{
 									((int)callLinkCircleRadius*2))), 
 									time+((int)callLinkCircleRadius));
 			pen.drawString(name+"( )", (labelWidth/2)*(1-right)+(int)objectControlLineWidth/2, time-(int)callLinkCircleRadius);
-		
+
 		}else if(call.getType().equals(CallType.CallReceive) || 
 				call.getType().equals(CallType.ReturnReceive)){
+			if(call.getType().equals(CallType.CallReceive)){
+				activeCalls++;
+			}
+			if (call.getType().equals(CallType.ReturnReceive)){
+				pen.setStroke(dashedStroke);
+			}
 			if(!call.getWay().equals(CallWay.Self)){
 				pen.drawString(name+"( )", (labelWidth/2)*(1-right)+
 						(int)objectControlLineWidth/2, 
 						time-(int)callLinkCircleRadius);
 				pen.drawLine(labelWidth*(1-right), time, 
-						labelWidth/2, time);
+						labelWidth/2+((int)Math.pow(-1, right)*((int)(objectControlLineWidth/2)*activeCalls)), time);
 			}else{
 				right = 0;
 				int time0 = time;
 				time = time+(int)callLinkCircleRadius*2;
-				pen.drawLine(labelWidth/2, time, 
+				pen.drawLine(labelWidth/2+((int)Math.pow(-1, right)*((int)(objectControlLineWidth/2)*activeCalls)), time, 
 						((labelWidth/4)*3), time);
 				pen.drawLine(((labelWidth/4)*3), time0, ((labelWidth/4)*3), time);
 			}
-			pen.drawLine(labelWidth/2, time, (int)(labelWidth/2+
+			pen.setStroke(normalStroke);
+			pen.drawLine(labelWidth/2+((int)Math.pow(-1, right)*((int)(objectControlLineWidth/2)*activeCalls)), time, (int)(labelWidth/2+((int)Math.pow(-1, right)*((int)(objectControlLineWidth/2)*activeCalls))+
 					(Math.pow(-1, right)*((int)callLinkCircleRadius*2))), 
 					time-((int)callLinkCircleRadius));
-			pen.drawLine(labelWidth/2, time, (int)(labelWidth/2+
+			pen.drawLine(labelWidth/2+((int)Math.pow(-1, right)*((int)(objectControlLineWidth/2)*activeCalls)), time, (int)(labelWidth/2+((int)Math.pow(-1, right)*((int)(objectControlLineWidth/2)*activeCalls))+
 					(Math.pow(-1, right)*((int)callLinkCircleRadius*2))), 
 					time+((int)callLinkCircleRadius));
 		}else if(call.getType().equals(CallType.CallPass)){
 			pen.drawLine(0, time, labelWidth, time);
 		}
+		pen.setStroke(normalStroke);
 		refreshDrawing();
 	}
-	
+
 	/**
 	 * Draws the given control line
 	 * @param controlLine
@@ -413,6 +423,19 @@ public class SequenceDiagramObject extends JLabel{
 	}
 
 	/**
+	 * Returns the number of active control lines for the object
+	 * @return activeCalls
+	 */
+	private int getNumberOfActiveControlLines(){
+		int activeCalls = 0;
+		for(SequenceDiagramObjectControlLine cl: controlLineList){
+			if(cl.isActive())
+				activeCalls++;
+		}
+		return activeCalls;
+	}
+
+	/**
 	 * Cleans the object's drawable space
 	 */
 	private void cleanObjectSpace(){
@@ -420,7 +443,7 @@ public class SequenceDiagramObject extends JLabel{
 		pen.fillRect(0, 0, labelWidth, drawableSpace.getHeight());
 		refreshDrawing();
 	}
-	
+
 	/**
 	 * Cleans the object's drop selection
 	 */
@@ -428,7 +451,7 @@ public class SequenceDiagramObject extends JLabel{
 		drawWholeObject();
 		refreshDrawing();
 	}
-	
+
 	/**
 	 * Returns true if the object hasn't been destroyed 
 	 * @return boolean
@@ -436,7 +459,7 @@ public class SequenceDiagramObject extends JLabel{
 	private boolean isAlive(){
 		return destructionTime == -1;
 	}
-	
+
 	/**
 	 * Refreshes the object's drawable space
 	 */

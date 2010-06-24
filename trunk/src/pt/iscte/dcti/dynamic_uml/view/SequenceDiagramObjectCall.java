@@ -10,6 +10,7 @@ public class SequenceDiagramObjectCall {
 
 	private String callName;
 	private int time;
+	private int activeCalls;
 	private CallWay way;
 	private CallType type;
 	
@@ -19,10 +20,12 @@ public class SequenceDiagramObjectCall {
 	 * @param time
 	 * @param way
 	 * @param type
+	 * @param activeCalls 
 	 */
-	public SequenceDiagramObjectCall(final String callName, final int time, final CallWay way, final CallType type){
+	public SequenceDiagramObjectCall(final String callName, final int time, final CallWay way, final CallType type, final int activeCalls){
 		this.callName = callName;
 		this.time = time;
+		this.activeCalls = activeCalls;
 		this.way = way;
 		this.type = type;
 	}
@@ -41,6 +44,14 @@ public class SequenceDiagramObjectCall {
 	 */
 	public int getTime() {
 		return time;
+	}
+	
+	/**
+	 * Getter for the number of active calls
+	 * @return time
+	 */
+	public int getNumberOfActiveCalls() {
+		return activeCalls;
 	}
 
 	/**

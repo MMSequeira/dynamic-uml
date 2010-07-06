@@ -29,6 +29,7 @@ public privileged aspect TracerAddon extends AbstractTracer {
 		sequence_diagram_view = new SequenceDiagramView();
 		hash_map = new HashMap<Integer, Integer>();
 		hash_object_caller = new HashMap<Integer, Integer>();
+		//hash_object_caller_objects = new HashMap<Object, Object>();
 	}
 	
 	//POINTCUTs
@@ -165,16 +166,18 @@ public privileged aspect TracerAddon extends AbstractTracer {
 			Object object = thisJoinPoint.getThis();
 			System.out.println(object);
 			
-			System.out.println("making in diagram, in special condition "+thisJoinPoint.getThis());
+			System.out.println("***making in diagram, in special condition "+thisJoinPoint.getThis());
 			
 			//This is a method from the object being created...
 			//If the source of the call does not exist in the diagram...
 			//If the id_caller is not in the hash_map it is because it wasn't drawn graphically yet, so we must draw it.
 			//The caller's caller will be assumed as -1 (System)
-			//TODO CHECK THIS WITH MORE EXAMPLES (IT DOESNT WORK. WILL REQUIRE A LINKED LIST WITH PAIRS...)
+			//TODO CHECK THIS WITH MORE EXAMPLES (IT DOESNT WORK. WILL REQUIRE AN HASHMAP/LINKED LIST WITH PAIRS...)
+			//TODO CHECK the differences between Box's main and Main from the MacroCells package... they are alike, but results are different here...
 			int id_caller = id_this;
+			int id_callers_caller = SYSTEM_OBJECT_NUMBER_ID;
 			String object_class_name = object.getClass().getName();
-			int id = sequence_diagram_view.createSequenceDiagramObject(object.toString(), object_class_name, SYSTEM_OBJECT_NUMBER_ID);
+			int id = sequence_diagram_view.createSequenceDiagramObject(object.toString(), object_class_name, id_callers_caller);
 			hash_map.put(id_caller, id);
 			
 			
@@ -198,7 +201,7 @@ public privileged aspect TracerAddon extends AbstractTracer {
 			*/
 			
 			
-			printInternalDebugLine("(Method) Creating sequence diagram object in special conditions, for: "+object.toString()+" from class: "+object_class_name+" diagram id from creator: "+SYSTEM_OBJECT_NUMBER_ID);
+			printInternalDebugLine("(Method) Creating sequence diagram object in special conditions, for: "+object.toString()+" from class: "+object_class_name+" diagram id from creator: "+id_callers_caller);
 			//int id = sequence_diagram_view.createSequenceDiagramObject(object.toString(), object_class_name, hash_map.get(diagram_id_caller));
 			//hash_map.put(System.identityHashCode(thisJoinPoint.getThis()), id);
 		}

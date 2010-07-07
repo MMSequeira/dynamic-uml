@@ -1,6 +1,7 @@
 package pt.iscte.dcti.dynamic_uml.aspects;
 
 import java.util.HashMap;
+import java.util.Stack;
 
 import pt.iscte.dcti.dynamic_uml.view.SequenceDiagramView;
 import pt.iscte.dcti.instrumentation.aspects.AbstractTracer;
@@ -8,7 +9,7 @@ import pt.iscte.dcti.instrumentation.aspects.AbstractTracer;
 public privileged aspect TracerAddon extends AbstractTracer {
 	
 	private final boolean DISPLAY_CONSOLE_MESSAGES = false;
-	private final boolean DISPLAY_INTERNAL_DEBUG_MESSAGES = true;
+	private final boolean DISPLAY_INTERNAL_DEBUG_MESSAGES = false;
 	private final int SYSTEM_OBJECT_NUMBER_ID = -1;
 	
 	private SequenceDiagramView sequence_diagram_view;
@@ -17,6 +18,8 @@ public privileged aspect TracerAddon extends AbstractTracer {
 	//HashMap<System.identityHashCode object (AFTER proceed), System.identityHashCode caller>
 	private HashMap<Integer, Integer> hash_object_caller;
 	
+	
+	private Stack<Integer> stack_constructor_callers;
 	//private HashMap<Object, Object> hash_object_caller_objects;
 	
 	private int id_system_in = System.identityHashCode(System.in);
@@ -29,6 +32,7 @@ public privileged aspect TracerAddon extends AbstractTracer {
 		sequence_diagram_view = new SequenceDiagramView();
 		hash_map = new HashMap<Integer, Integer>();
 		hash_object_caller = new HashMap<Integer, Integer>();
+		stack_constructor_callers = new Stack<Integer>();
 		//hash_object_caller_objects = new HashMap<Object, Object>();
 	}
 	
@@ -175,12 +179,22 @@ public privileged aspect TracerAddon extends AbstractTracer {
 			//TODO CHECK THIS WITH MORE EXAMPLES (IT DOESNT WORK. WILL REQUIRE AN HASHMAP/LINKED LIST WITH PAIRS...)
 			//TODO CHECK the differences between Box's main and Main from the MacroCells package... they are alike, but results are different here...
 			int id_caller = id_this;
-			int id_callers_caller = SYSTEM_OBJECT_NUMBER_ID;
+			int id_callers_caller;
+			if(stack_constructor_callers.empty())
+				id_callers_caller = SYSTEM_OBJECT_NUMBER_ID;
+			else {
+				id_callers_caller = stack_constructor_callers.peek();
+				id_callers_caller = hash_map.get(id_callers_caller); 
+			}
 			String object_class_name = object.getClass().getName();
 			int id = sequence_diagram_view.createSequenceDiagramObject(object.toString(), object_class_name, id_callers_caller);
 			hash_map.put(id_caller, id);
+			stack_constructor_callers.push(id_caller);
 			
-			
+//			System.out.println("-- Id this: "+id_this);
+//			System.out.println("hash_map: "+hash_map);
+//			System.out.println("hash_object_caller: "+hash_object_caller);
+//			System.out.println("--");
 			
 			//if(thisJoinPoint.getThis().equals(thisJoinPoint.getTarget()))
 				//id_caller = 
@@ -241,7 +255,8 @@ public privileged aspect TracerAddon extends AbstractTracer {
 		}
 		
 		proceed();
-		
+		if(!stack_constructor_callers.empty())
+			stack_constructor_callers.pop();
 		//Create Return in Sequence Diagram
 		if(id_is_not_from_system)
 			sequence_diagram_view.createReturn(method_call);

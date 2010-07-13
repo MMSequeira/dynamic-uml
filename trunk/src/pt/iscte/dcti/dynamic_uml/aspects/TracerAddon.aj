@@ -26,7 +26,6 @@ public privileged aspect TracerAddon extends AbstractTracer {
 	private int id_system_out = System.identityHashCode(System.out);
 	private int id_system_err = System.identityHashCode(System.err);
 	
-	//private Object caller = null;
 	
 	public TracerAddon() {
 		sequence_diagram_view = new SequenceDiagramView();

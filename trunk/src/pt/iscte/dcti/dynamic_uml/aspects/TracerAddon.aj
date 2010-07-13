@@ -347,7 +347,7 @@ public privileged aspect TracerAddon extends AbstractTracer {
 //		printInternalDebugLine("### Method Call Finished ###");
 //		//System.out.println("METHOD DEBUG POINT END");
 //	}
-//	
+
 	Object around() : functionCalls() {
 		printInternalDebugLine("### Function Call -> Signature: "+thisJoinPoint.getSignature()+" This: "+thisJoinPoint.getThis()+" ID_This: "+System.identityHashCode(thisJoinPoint.getThis())+" - Target: "+thisJoinPoint.getTarget()+" ID_Target: "+System.identityHashCode(thisJoinPoint.getTarget()));
 
@@ -434,14 +434,14 @@ public privileged aspect TracerAddon extends AbstractTracer {
 		printInternalDebugLine("Corrected Function - Hashmap<System.code, diagram_id> -> this: "+diagram_id_this+" , target: "+diagram_id_target);
 		
 		//Create Call in Sequence Diagram
-		int method_call = 0; // We set a value just for compiler reasons
+		int function_call = 0; // We set a value just for compiler reasons
 		//If the call does not target the system, then it is because it is a normal call, or a call from the system to the program.
 		boolean id_is_not_from_system = (diagram_id_target != SYSTEM_OBJECT_NUMBER_ID);
 		//boolean id_is_not_from_system = (diagram_id_this != SYSTEM_OBJECT_NUMBER_ID || diagram_id_target != SYSTEM_OBJECT_NUMBER_ID);
 		if(id_is_not_from_system) {
 			printInternalDebugLine("----CREATING NEW FUNCTION CALL IN DIAGRAM----");
 			printInternalDebugLine("I will call .createCall("+thisJoinPoint.getSignature().getName()+", "+diagram_id_this+", "+diagram_id_target+")");
-			method_call = sequence_diagram_view.createCall(thisJoinPoint.getSignature().getName(), diagram_id_this, diagram_id_target);
+			function_call = sequence_diagram_view.createCall(thisJoinPoint.getSignature().getName(), diagram_id_this, diagram_id_target);
 			printInternalDebugLine("-FINISHED FUNCTION CALL CREATION IN DIAGRAM-");
 		} 
 		if(DISPLAY_CONSOLE_MESSAGES) {
@@ -455,7 +455,7 @@ public privileged aspect TracerAddon extends AbstractTracer {
 			stack_constructor_callers.pop();
 		//Create Return in Sequence Diagram
 		if(id_is_not_from_system)
-			sequence_diagram_view.createReturn(method_call);
+			sequence_diagram_view.createReturn(function_call);
 		
 		printInternalDebugLine("### FUNCTION Call Finished -> Sig: "+thisJoinPoint.getSignature()+" ###");
 		return o;

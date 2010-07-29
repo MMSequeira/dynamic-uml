@@ -3,6 +3,7 @@ package examples.simple;
 public class PersonalSeller {
 
 	private String name;
+    @SuppressWarnings("unused")
 	private boolean attention = false;
 	
 	public PersonalSeller(String name) {

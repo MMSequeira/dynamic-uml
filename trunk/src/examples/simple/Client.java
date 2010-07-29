@@ -2,6 +2,7 @@ package examples.simple;
 
 public class Client {
 
+    @SuppressWarnings("unused")
 	private String name;
 	private PersonalSeller personal_seller;
 	private int thoughts_taken = 0;

@@ -50,7 +50,7 @@ public class SequenceDiagramObject extends JLabel{
 	private String objectName;
 	private String objectClass;
 	private int objectID;
-	private DragAndDropController dragAndDropController;
+//	private DragAndDropController dragAndDropController;
 	private EventTimeController eventTimeController;
 	private LinkedList<SequenceDiagramObjectCall> callList;
 	private LinkedList<SequenceDiagramObjectControlLine> controlLineList;
@@ -79,7 +79,7 @@ public class SequenceDiagramObject extends JLabel{
 		this.objectName = objectName;
 		this.objectClass = objectClass;
 		this.objectID = objectID;
-		this.dragAndDropController = dragAndDropController;
+//		this.dragAndDropController = dragAndDropController;
 		this.eventTimeController = eventTimeController;
 		callList = new LinkedList<SequenceDiagramObjectCall>();
 		controlLineList = new LinkedList<SequenceDiagramObjectControlLine>();
@@ -426,14 +426,14 @@ public class SequenceDiagramObject extends JLabel{
 	 * Returns the number of active control lines for the object
 	 * @return activeCalls
 	 */
-	private int getNumberOfActiveControlLines(){
-		int activeCalls = 0;
-		for(SequenceDiagramObjectControlLine cl: controlLineList){
-			if(cl.isActive())
-				activeCalls++;
-		}
-		return activeCalls;
-	}
+//	private int getNumberOfActiveControlLines(){
+//		int activeCalls = 0;
+//		for(SequenceDiagramObjectControlLine cl: controlLineList){
+//			if(cl.isActive())
+//				activeCalls++;
+//		}
+//		return activeCalls;
+//	}
 
 	/**
 	 * Cleans the object's drawable space

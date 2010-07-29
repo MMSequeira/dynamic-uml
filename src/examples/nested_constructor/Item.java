@@ -2,8 +2,11 @@ package examples.nested_constructor;
 
 public class Item {
 
+    @SuppressWarnings("unused")
 	private String name;
+    @SuppressWarnings("unused")
 	private Label label1;
+    @SuppressWarnings("unused")
 	private Label label2;
 	
 	public Item(String name) {

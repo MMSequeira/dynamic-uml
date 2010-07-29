@@ -14,6 +14,7 @@ public class Main {
 		
 		client_bob.askQuestion("Tell me the price, please.");
 		
+	    @SuppressWarnings("unused")
 		String seller_name = client_bob.askName();
 		
 		PersonalSeller seller_tina = new PersonalSeller("Tina");

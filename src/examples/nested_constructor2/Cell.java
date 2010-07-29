@@ -1,7 +1,9 @@
 package examples.nested_constructor2;
 
 public class Cell {
+    @SuppressWarnings("unused")
 	private MicroCell micro_cell1;
+    @SuppressWarnings("unused")
 	private MicroCell micro_cell2;
 	
 	public Cell() {

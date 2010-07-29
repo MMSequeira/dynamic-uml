@@ -2,7 +2,9 @@ package examples.simple;
 
 public class ComplaintLetter {
 
+    @SuppressWarnings("unused")
 	private String title;
+    @SuppressWarnings("unused")
 	private String message;
 	
 	public ComplaintLetter(String title, String message) {

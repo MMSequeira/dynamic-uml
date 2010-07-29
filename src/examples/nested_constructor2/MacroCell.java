@@ -2,7 +2,9 @@ package examples.nested_constructor2;
 
 public class MacroCell {
 
+    @SuppressWarnings("unused")
 	private Cell cell1;
+    @SuppressWarnings("unused")
 	private Cell cell2;
 	
 	public MacroCell() {

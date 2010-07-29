@@ -1,6 +1,6 @@
 package examples.family;
 
-import java.util.LinkedList;
+//import java.util.LinkedList;
 
 public class Parents {
 
@@ -8,7 +8,9 @@ public class Parents {
 	private String motherFirstName;
 	private String fatherLastName;
 	private String motherLastName;
-	private Child child0;
+	@SuppressWarnings("unused")
+    private Child child0;
+    @SuppressWarnings("unused")
 	private Child child1;
 	//private LinkedList<Child> children;
 	

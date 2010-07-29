@@ -2,6 +2,7 @@ package examples.nested_constructor2;
 
 public class MicroCell {
 	
+    @SuppressWarnings("unused")
 	private float frequency;
 	
 	public MicroCell() {
